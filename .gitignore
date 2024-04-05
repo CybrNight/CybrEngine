@@ -3,7 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-#OS junk files
+#OS junk files1
 [Tt]humbs.db
 *.DS_Store
 
