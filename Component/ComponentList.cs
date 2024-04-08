@@ -8,59 +8,43 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     internal class ComponentList {
 
-        private static ComponentList _instance;
-        public static ComponentList Instance { 
-            get {
-                if (_instance == null) {
-                    _instance = new ComponentList();
-                }
-                return _instance;
-            }   
-        } 
-        private ComponentList() { }
-
-        private static Dictionary<Entity, List<Component>> components = new Dictionary<Entity, List<Component>>();
-
-        public Component AddComponent(Entity entity, Type cType){
-            Component newComp = null;
-            if (!components.ContainsKey(entity)) {
-                components.Add(entity, new List<Component>());
-            }
-        
-            if (cType == typeof(Transform)) {
-                newComp = new Transform();
-            }
+        public ComponentList() { 
             
-            if (newComp == null) {
-                throw new Exception("Passed component invalid!");
-            }
-            components[entity].Add(newComp);
-            return newComp;
         }
 
-        public Component GetComponent<T>(Entity entity){
-            //Check components list for entity
-            if (components.ContainsKey(entity)){
-                var compList = components[entity];
-                //Search components list for component
-                for (int i = 0;i < compList.Count; i++){
-                    var comp = compList[i];
-                    //If match return component;
-                    if (comp.GetType() == typeof(T)){
-                        return comp;
-                    }
-                }
+        private Dictionary<Type, List<Component>> cList = new Dictionary<Type, List<Component>>();
+
+        public T AddComponent<T>(T component) where T : Component{
+            Type cType = component.CType;
+
+            if (!cList.ContainsKey(cType)) {
+                cList.Add(typeof(T), new List<Component>());
             }
-            return null;
+
+            cList[cType].Add(component);
+
+            return component;
         }
 
-        public List<Component> GetComponents<T>(Entity entity) {
+        public T GetComponent<T>() where T : Component{
             //Check components list for entity
-            if(components.ContainsKey(entity)) {
-                var compList = components[entity];
-                return compList;
+            Type cType = typeof(T);
+        
+            if (!cList.ContainsKey(cType)) {
+                return null;
             }
-            return null;
+            return (T)cList[cType].First();
+        }
+
+        public List<T> GetComponents<T>() where T : Component {
+            //Check components list for entity
+            Type cType = typeof(T);
+
+            List<T> result = new List<T>(cList[cType].Count);
+            foreach (Component c in cList[cType]){
+                result.Add((T)c);
+            }
+            return result;
         }
     }
 }

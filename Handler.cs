@@ -44,10 +44,17 @@ namespace CybrEngine {
         public void Draw(SpriteBatch spriteBatch){
             for (int i = 0; i < entities.Count;i++){
                 Entity e = entities[i];
-                Texture2D sprite = e.sprite;
+                var t = e.GetComponent<Transform>();
+
+                if (!t){
+                    continue;
+                }
+
+                Texture2D sprite = t.sprite;
+                Vector2 pos = t.position;
 
                 spriteBatch.Begin();
-                spriteBatch.Draw(sprite, e.position, null, Color.White, 0f,
+                spriteBatch.Draw(sprite, pos, null, Color.White, 0f,
                 new Vector2(sprite.Width / 2, sprite.Height / 2),
                 Vector2.One,
                 SpriteEffects.None,

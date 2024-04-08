@@ -25,12 +25,8 @@ namespace CybrEngine {
 
         protected Entity(){
             handler = Handler.Instance;
+            cList = new ComponentList();
         }
-
-        public virtual void SetSprite(string name){
-            _sprite = Assets.GetSprite(name);
-        }
-
 
         public virtual void Update(){
 
@@ -54,12 +50,12 @@ namespace CybrEngine {
             handler.Instantiate(entity);
         }
 
-        protected void AddComponenent(Type cType){
-            cList.AddComponent(this, cType);
+        public T AddComponenent<T>(T component) where T : Component{
+            return cList.AddComponent(component);
         }
 
-        protected void GetComponent<T>(Entity entity){
-            cList.GetComponent<T>(entity);
+        public T GetComponent<T>() where T: Component{
+            return cList.GetComponent<T>();
         }
     }
 }
