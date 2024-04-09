@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,34 +34,33 @@ namespace CybrEngine {
         public void Update(){
             for(int i = 0; i < entities.Count; i++){
                 Entity e = entities[i];
-                Console.WriteLine(e.position.ToString());
                 if(e.IsDestroyed){
                     entities.Remove(e);
                 }
-
                 e.Update();
+
+                var t1 = e.GetComponent<Transform>();
+                if(t1) {
+                    Debug.WriteLine("Hello1");
+                    for(int j = i + 1; j < entities.Count; j++) {
+                        Entity o = entities[j];
+                        var t2 = o.GetComponent<Transform>();
+                        if (t2) {
+                            if (t1.Intersects(t2)){
+                                Debug.WriteLine("t1 touch t2");
+                            }
+                        }
+                    }
+                }
+                
+                
             }
         }
     
-        public void Draw(SpriteBatch spriteBatch){
+        public void Draw(SpriteBatch batch){
             for (int i = 0; i < entities.Count;i++){
                 Entity e = entities[i];
-                var t = e.GetComponent<Transform>();
-
-                if (!t){
-                    continue;
-                }
-
-                Texture2D sprite = t.sprite;
-                Vector2 pos = t.position;
-
-                spriteBatch.Begin();
-                spriteBatch.Draw(sprite, pos, null, Color.White, 0f,
-                new Vector2(sprite.Width / 2, sprite.Height / 2),
-                Vector2.One,
-                SpriteEffects.None,
-                0f);
-                spriteBatch.End();
+                e.Draw(batch);
             }
     }
         }    

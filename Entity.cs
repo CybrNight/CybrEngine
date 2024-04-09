@@ -2,22 +2,16 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CybrEngine {
     public abstract class Entity {
 
         //Private references to engine systems
-
-        private Vector2 _positiion;
         private Texture2D _sprite;
         private Handler handler;
         private ComponentList cList;
-
-        public Vector2 position{ 
-            get{ return _positiion; }
-            set{ _positiion = value; }
-        }
 
         public Texture2D sprite {
             get { return _sprite; }
@@ -25,11 +19,15 @@ namespace CybrEngine {
 
         protected Entity(){
             handler = Handler.Instance;
-            cList = new ComponentList();
+            cList = new ComponentList(this);
         }
 
         public virtual void Update(){
+            cList.UpdateAll();
+        }
 
+        public virtual void Draw(SpriteBatch batch){
+            cList.DrawAll(batch);
         }
 
 
@@ -50,11 +48,14 @@ namespace CybrEngine {
             handler.Instantiate(entity);
         }
 
+        //Adds new Component to Entity
         public T AddComponenent<T>(T component) where T : Component{
             return cList.AddComponent(component);
         }
 
+        //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T: Component{
+            Debug.WriteLine(typeof(T));
             return cList.GetComponent<T>();
         }
     }

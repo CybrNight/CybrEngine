@@ -1,19 +1,17 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public abstract class Component {
-        public Entity entity;
+    public interface IComponent {
+
+
+        public Entity Entity { get; set; }
         public string Name { get; set; }
 
         public abstract Type CType { get; }
-    
-        public static implicit operator bool(Component c) {
-            return c != null;
-        }
-                  
     }
 }
