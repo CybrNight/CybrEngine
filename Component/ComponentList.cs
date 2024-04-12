@@ -56,8 +56,8 @@ namespace CybrEngine {
             foreach(List<Component> list in cList.Values) {
                 int innerSize = list.Count;
                 foreach(Component component in list) {
-                    if(component is ICUpdate) {
-                        (component as ICUpdate).Update();
+                    if(component is IComponentUpdate) {
+                        (component as IComponentUpdate).Update();
                         if(innerSize != list.Count) {
                             return;
                         }
@@ -74,8 +74,8 @@ namespace CybrEngine {
             foreach(List<Component> list in cList.Values) {
                 int innerSize = list.Count;
                 foreach(Component component in list) {
-                    if(component is ICDraw) {
-                        (component as ICDraw).Draw(batch);
+                    if(component is IGraphicComponent) {
+                        (component as IGraphicComponent).Draw(batch);
                         if(innerSize != list.Count) {
                             return;
                         }

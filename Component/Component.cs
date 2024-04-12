@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Component {
         public Entity entity;
-        public string Name { get; set; }
+        
+        protected readonly bool _unqiue;
 
-        public abstract Type CType { get; }
-    
+        public virtual Type CType { get { return this.GetType(); } }
+        public virtual bool Unique { get; }
+        public virtual string Name { get; protected set; }
+
         public static implicit operator bool(Component c) {
             return c != null;
         }
-                  
+
+
     }
 }

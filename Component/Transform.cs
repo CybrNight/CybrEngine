@@ -8,13 +8,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class Transform : Component, ICDraw, ICUpdate{
+    public class Transform : Component{
         private Vector2 _position;
         private Vector2 _velocity;
         private Vector2 _scale = Vector2.One;
         private Rectangle _bounds = new Rectangle();
 
         private Texture2D _sprite;
+
+        public Transform(){ Name = "Transform"; }
+
+        public Transform(Vector2 position){
+            _position = position;
+        }
+
+        public Transform(float x, float y) : this(new Vector2(x, y)) { }
+
+        
+
+        public override bool Unique{
+            get{ return true; }
+        }
 
         public Vector2 position {
             get { return _position; }
