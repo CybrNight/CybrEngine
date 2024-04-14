@@ -16,15 +16,13 @@ namespace CybrEngine {
 
         private Texture2D _sprite;
 
-        public Transform(){ Name = "Transform"; }
+        public Transform(){ _name = "Transform"; }
 
         public Transform(Vector2 position){
             _position = position;
         }
 
         public Transform(float x, float y) : this(new Vector2(x, y)) { }
-
-        
 
         public override bool Unique{
             get{ return true; }

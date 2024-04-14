@@ -6,11 +6,11 @@ using System.Diagnostics;
 using System.Linq;
 
 namespace CybrEngine {
-    public abstract class Entity {
+    public abstract class Entity : Object {
 
         //Private references to engine systems
         private Texture2D _sprite;
-        private Handler handler;
+        private static ObjectHandler handler;
         private ComponentList cList;
 
         public Texture2D sprite {
@@ -18,7 +18,7 @@ namespace CybrEngine {
         }
 
         protected Entity(){
-            handler = Handler.Instance;
+            handler = ObjectHandler.Instance;
             cList = new ComponentList(this);
         }
 
@@ -30,21 +30,15 @@ namespace CybrEngine {
             cList.DrawAll(batch);
         }
 
+        public override void Destroy(){
+            BeingDestroyed = true;
 
-        protected bool Destroyed = false;
-        protected bool BeingDestroyed = false;
-        
-        public bool IsDestroyed {
-            get {
-                return Destroyed || BeingDestroyed;
-            }
+            cList.Destroy();
+
+            Destroyed = true;
         }
 
-        protected void Destory(Entity entity){
-            entity.Destroyed = true;
-        }
-
-        protected void Instantiate(Entity entity){
+        public static void Instantiate(Entity entity){
             handler.Instantiate(entity);
         }
 
@@ -58,5 +52,6 @@ namespace CybrEngine {
             Debug.WriteLine(typeof(T));
             return cList.GetComponent<T>();
         }
+
     }
 }

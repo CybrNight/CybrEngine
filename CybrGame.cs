@@ -9,7 +9,7 @@ namespace CybrEngine
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private Handler handler;
+        private ObjectHandler handler;
 
         private int fixedUpdateRate;
 
@@ -19,7 +19,7 @@ namespace CybrEngine
 
         public CybrGame() : base(){ 
             graphics = new GraphicsDeviceManager(this);
-            handler = Handler.Instance;
+            handler = ObjectHandler.Instance;
 
             Content.RootDirectory = "Content";
 

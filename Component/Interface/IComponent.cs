@@ -11,11 +11,10 @@ namespace CybrEngine {
 
         public virtual void Update(){ }
 
+        public bool Unique { get; }
+        public Entity Owner { get; set; }
+        public virtual string Name { get { return Name; } }
 
-        public void Test(){ Debug.Write("");}
-        public Entity Entity { get; set; }
-        public string Name { get; }
-
-        public abstract Type CType { get; }
+        public Type ComponentGroup { get; }
     }
 }
