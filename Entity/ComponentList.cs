@@ -10,14 +10,14 @@ using System.Diagnostics;
 namespace CybrEngine {
     internal class ComponentList {
 
-        public ComponentList(Entity owner) {
-            this.owner = owner;
-        }
-
         //Reference to world entity that component is attached to
         private Entity owner;
 
         private Dictionary<IComponent, List<Component>> cList = new Dictionary<IComponent, List<Component>>();
+
+        public ComponentList(Entity owner) {
+            this.owner = owner;
+        }
 
         public void Destroy(){
             owner = null;

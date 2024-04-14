@@ -13,7 +13,9 @@ namespace CybrEngine {
 
         private static List<Entity> entities = new List<Entity>();
         private static List<Transform> transforms = new List<Transform>();
-        private static List<ComponentList> components = new List<ComponentList>(); 
+        private static List<ComponentList> components = new List<ComponentList>();
+
+        private static int nextId;
 
         private static ObjectHandler _instance;
         public static ObjectHandler Instance {
@@ -26,11 +28,19 @@ namespace CybrEngine {
         }
 
         private ObjectHandler() {
-
+            nextId = -1;
         }
 
         public void Instantiate(Entity entity) {
             entities.Add(entity);
+        }
+
+        public int AssignId(){
+            return ++nextId;
+        }
+
+        public T AddComponent<T>(T component) where T : Component {
+            
         }
 
         public void Update() {

@@ -10,7 +10,6 @@ namespace CybrEngine {
 
         //Private references to engine systems
         private Texture2D _sprite;
-        private static ObjectHandler handler;
         private ComponentList cList;
 
         public Texture2D sprite {
@@ -44,13 +43,13 @@ namespace CybrEngine {
 
         //Adds new Component to Entity
         public T AddComponenent<T>(T component) where T : Component{
-            return cList.AddComponent(component);
+            return handler.AddComponent(component);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T: Component{
             Debug.WriteLine(typeof(T));
-            return cList.GetComponent<T>();
+            return handler.GetComponent<T>();
         }
 
     }
