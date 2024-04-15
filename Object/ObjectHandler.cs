@@ -9,13 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    internal class ObjectHandler {
+    public class ObjectHandler {
 
-        private static List<Entity> entities = new List<Entity>();
-        private static List<Transform> transforms = new List<Transform>();
+        private static List<Entity> objectList = new List<Entity>();
+        private static Queue<Entity> creationQueue = new Queue<Entity>();
+
         private static List<ComponentList> components = new List<ComponentList>();
-
-        private static int nextId;
 
         private static ObjectHandler _instance;
         public static ObjectHandler Instance {
@@ -27,57 +26,89 @@ namespace CybrEngine {
             }
         }
 
-        private ObjectHandler() {
-            nextId = -1;
-        }
-
-        public void Instantiate(Entity entity) {
-            entities.Add(entity);
-        }
-
-        public int AssignId(){
-            return ++nextId;
-        }
-
-        public T AddComponent<T>(T component) where T : Component {
+        /// <summary>
+        /// Method to handle instantiating all queued objects from last cycle
+        /// </summary>
+        private void InstantiateQueuedObjects(){
+            while (creationQueue.Count > 0) {
+                var obj = creationQueue.Dequeue();
+                obj.AddComponenent(new Transform());
+                obj.Awake();
+                objectList.Add(obj);
+                obj.Start();
+            }
             
         }
 
+        /// <summary>
+        /// Adds new Entity to creationQueue, creates new ComponentList entry and returns reference to new Entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public void Instantiate(Type eType) {
+            Entity entity = (Entity)Activator.CreateInstance(eType);
+            creationQueue.Enqueue(entity); 
+            components.Add(new ComponentList(entity)); 
+        }
+
+        /// <summary>
+        /// Returns specified component for CINDEX passed from entity
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="CINDEX"></param>
+        /// <returns></returns>
+        public T GetComponent<T>(int CINDEX) where T : Component {
+            if (CINDEX >= components.Count)
+                return null;
+
+            ComponentList cList = components[CINDEX];
+            return cList.GetComponent<T>();
+        }
+
+        /// <summary>
+        /// Adds new Component to Entity (CINDEX)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="CINDEX"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        public T AddComponent<T>(int CINDEX, T component) where T : Component {
+            if(CINDEX >= components.Count){
+                Debug.WriteLine(CINDEX);
+                return null;
+            }
+
+            ComponentList cList = components[CINDEX];
+            return cList.AddComponent(component); ;
+        }
+
+        /// <summary>
+        /// Method that handles updating all entities
+        /// </summary>
         public void Update() {
-            for(int i = 0; i < entities.Count; i++) {
-                Entity e = entities[i];
+            InstantiateQueuedObjects(); //Instanatiae all new entities
+
+
+            for(int i = 0; i < objectList.Count; i++) {
+                Entity e = objectList[i];
+
+                //Cleanup entity if marked for destruction
                 if(e.IsDestroyed) {
-                    entities.Remove(e);
+                    int index = e.ComponentIndex;
+                    objectList.Remove(e);
+                    components[index].Destroy();
+                    components.RemoveAt(index);
                 }
-            }
 
-            for(int i = 0; i < transforms.Count; i++) {
-                var t1 = transforms[i];
-                for(int j = 0; j < transforms.Count; j++) {
-                    var t2 = transforms[j];
-
-                    //Check that t1 and t2 are not same entity
-                    if(t1 == t2)
-                        continue;
-                    if(t1.Intersects(t2)) {
-                        Debug.WriteLine("t1 intersect t2");
-                    }
-
-                }
-            }
-
-            for(int i = 0; i < entities.Count; i++) {
-                Entity e = entities[i];
                 e.Update();
             }
-
         }
 
         public void Draw(SpriteBatch batch) {
 
-            for(int i = 0; i < transforms.Count; i++) {
-                var t1 = transforms[i];
-                t1.Draw(batch);
+            for(int i = 0; i < components.Count; i++) {
+                var c = components[i];
+                c.DrawAll(batch);
             }
         }
     }

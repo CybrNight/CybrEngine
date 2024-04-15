@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace CybrEngine
 {
@@ -93,7 +94,7 @@ namespace CybrEngine
             base.Draw(gameTime);
         }
 
-        protected void Instantiate(Entity entity){
+        protected void Instantiate(Type entity){
             handler.Instantiate(entity);
         }
     }

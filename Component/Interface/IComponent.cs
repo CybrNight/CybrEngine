@@ -11,10 +11,8 @@ namespace CybrEngine {
 
         public virtual void Update(){ }
 
-        public bool Unique { get; }
+        public bool Unique { get; protected set;  }
         public Entity Owner { get; set; }
-        public virtual string Name { get { return Name; } }
-
-        public Type ComponentGroup { get; }
+        public string Name { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace CybrEngine {
             }
         }
 
-        public static Texture2D GetSprite(string name){
+        public static Texture2D GetTexture(string name){
             if (sprites.ContainsKey(name)) return sprites[name];
             else {
                 throw new NullReferenceException(name + " does not exist in the Asset store");

@@ -13,7 +13,7 @@ namespace CybrEngine {
         //Reference to world entity that component is attached to
         private Entity owner;
 
-        private Dictionary<IComponent, List<Component>> cList = new Dictionary<IComponent, List<Component>>();
+        private Dictionary<Type, List<Component>> cList = new Dictionary<Type, List<Component>>();
 
         public ComponentList(Entity owner) {
             this.owner = owner;
@@ -73,24 +73,23 @@ namespace CybrEngine {
                     return;
                 }
             }
-        }
 
-        public void DrawAll(SpriteBatch batch){
-            int startSize = cList.Count;
-            foreach(List<Component> list in cList.Values) {
-                int innerSize = list.Count;
-                foreach(Component component in list) {
-                    if(component is IDrawComponent) {
-                        (component as IDrawComponent).Draw(batch);
-                        if(innerSize != list.Count) {
-                            return;
+            public void DrawAll(SpriteBatch batch) {
+                int startSize = cList.Count;
+                foreach(List<Component> list in cList.Values) {
+                    int innerSize = list.Count;
+                    foreach(Component component in list) {
+                        if(component is IDrawComponent) {
+                            (component as IDrawComponent).Draw(batch);
+                            if(innerSize != list.Count) {
+                                return;
+                            }
                         }
                     }
+                    if(startSize != cList.Count) {
+                        return;
+                    }
                 }
-                if(startSize != cList.Count) {
-                    return;
-                }
-            }
         }
     }
-}
+    }

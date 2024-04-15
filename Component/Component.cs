@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 /// Defines generic Component base class
 /// </summary>
 namespace CybrEngine {
-    public abstract class Component : Object, IComponent {
+    public abstract class Component : IComponent {
 
-        protected readonly string _name;
-        protected readonly bool _unique = false;
         protected readonly Type _cgroup;
 
+        public abstract void Update();
+
+        public string Name { get; set; }
         public Entity Owner { get; set; }
-        public bool Unique { get { return _unique; } }
-        public Type ComponentGroup { get { return typeof(IComponent);} }
+        public bool Unique { get; set; }
+        public virtual Type ComponentGroup { get { return typeof(IComponent);} }
 
         // Overload bool to allow null checks
         public static implicit operator bool(Component component) {

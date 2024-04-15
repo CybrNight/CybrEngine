@@ -6,10 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public interface IDrawComponent : IComponent {
-        public Texture2D sprite { get; }
+    public interface IDrawComponent {
 
         public void Draw(SpriteBatch batch);
-        public void SetSprite(string path);
     }
 }

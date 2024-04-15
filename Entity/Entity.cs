@@ -10,46 +10,47 @@ namespace CybrEngine {
 
         //Private references to engine systems
         private Texture2D _sprite;
-        private ComponentList cList;
+        public int ComponentIndex { get; protected set; }
+        private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
 
+        public Transform Transform { get; protected set; }
         public Texture2D sprite {
             get { return _sprite; }
         }
 
         protected Entity(){
             handler = ObjectHandler.Instance;
-            cList = new ComponentList(this);
+            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
         }
 
-        public virtual void Update(){
-            cList.UpdateAll();
-        }
+        public abstract void Awake();
+        public abstract void Start();
+        public abstract void Update();
+     
 
         public virtual void Draw(SpriteBatch batch){
-            cList.DrawAll(batch);
+           // cList.DrawAll(batch);
         }
 
         public override void Destroy(){
             BeingDestroyed = true;
 
-            cList.Destroy();
-
             Destroyed = true;
         }
 
-        public static void Instantiate(Entity entity){
+        public static void Instantiate(Type entity){
             handler.Instantiate(entity);
         }
 
         //Adds new Component to Entity
         public T AddComponenent<T>(T component) where T : Component{
-            return handler.AddComponent(component);
+            return handler.AddComponent(ComponentIndex, component);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T: Component{
             Debug.WriteLine(typeof(T));
-            return handler.GetComponent<T>();
+            return handler.GetComponent<T>(ComponentIndex);
         }
 
     }
