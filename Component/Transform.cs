@@ -41,15 +41,6 @@ namespace CybrEngine {
             Bounds = _sprite.Bounds;
         }
 
-        public override void Update() {
-            var delta = Globals.GameTime.ElapsedGameTime;
-            Position += Velocity;
-            Debug.WriteLine(Velocity + " " + Position);
-
-
-            Bounds = new Rectangle((int)Position.X, (int)Position.Y, sprite.Width, sprite.Height);
-        }
-
         public void Draw(SpriteBatch batch) {
             batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             RasterizerState state = new RasterizerState();

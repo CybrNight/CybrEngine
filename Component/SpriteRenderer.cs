@@ -9,22 +9,17 @@ using System.Threading.Tasks;
 
 namespace CybrEngine {
     public class SpriteRenderer : Component, IDrawComponent{
-        protected Transform transform;
 
         public SpriteRenderer(){ 
-            Name = "Transform";
-            transform = Owner.GetComponent<Transform>();
+            Name = "SpriteRenderer";
             
-            if (!transform){
-                throw new NullReferenceException("SpriteRenderer must be attached to Entity with Transform component");
-            }
         }
 
         public SpriteRenderer(Texture2D tex){
             Tex = tex;
         }
         
-        public Vector2 Position { get { return transform.Position; } set { transform.Position = value; } }
+        public Transform Transform { get; set; }
         public Vector2 Scale { get; set; }
         public Vector2 Offset { get; set; }
         public Texture2D Tex { get; private set; }
@@ -37,22 +32,18 @@ namespace CybrEngine {
             Tex = Assets.GetTexture(path);
         }
 
-        public override void Update(){
-            
-        }
-
-        public void Draw(SpriteBatch batch) {
+        public void Draw(SpriteBatch batch) { 
             batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             RasterizerState state = new RasterizerState();
             state.FillMode = FillMode.WireFrame;
             batch.GraphicsDevice.RasterizerState = state;
 
             //loop this for all sprites!
-            batch.Draw(Tex, Position, Color.White);
+            batch.Draw(Tex, Transform.Position, Color.White);
             batch.End();
 
             batch.Begin();
-            batch.Draw(Tex, Position, null, Color.White, 0f,
+            batch.Draw(Tex, Transform.Position, null, Color.White, 0f,
             new Vector2(0, 0),
             Scale,
             SpriteEffects.None,
