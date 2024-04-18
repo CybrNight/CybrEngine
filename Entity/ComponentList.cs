@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
 namespace CybrEngine {
-    internal class ComponentList {
+    public class ComponentList {
 
         //Reference to world entity that component is attached to
         private Entity owner;
@@ -19,29 +19,30 @@ namespace CybrEngine {
             this.owner = owner;
         }
 
-        public void Destroy(){
+        public void Destroy() {
             owner = null;
             cList.Clear();
         }
 
-        public T AddComponent<T>(T component) where T : Component{
+        public T AddComponent<T>(T component) where T : Component {
             Type cType = component.ComponentGroup;
 
-            if (!cList.ContainsKey(cType)) {
+            if(!cList.ContainsKey(cType)) {
                 cList.Add(cType, new List<Component>());
             }
 
             cList[cType].Add(component);
             component.Owner = owner;
+            component.Init();
 
             return component;
         }
 
-        public T GetComponent<T>() where T : Component{
+        public T GetComponent<T>() where T : Component {
             //Check components list for entity
             Type cType = typeof(T);
-        
-            if (!cList.ContainsKey(typeof(T))) {
+
+            if(!cList.ContainsKey(typeof(T))) {
                 return null;
             }
             return (T)cList[cType].First();
@@ -52,7 +53,7 @@ namespace CybrEngine {
             Type cType = typeof(T);
 
             List<T> result = new List<T>(cList[cType].Count);
-            foreach (IComponent c in cList[cType]){
+            foreach(Component c in cList[cType]) {
                 result.Add((T)c);
             }
             return result;
@@ -63,7 +64,24 @@ namespace CybrEngine {
             foreach(List<Component> list in cList.Values) {
                 int innerSize = list.Count;
                 foreach(Component component in list) {
-                        (component).Update();
+                    //(component).Update();
+                    if(innerSize != list.Count) {
+                        return;
+                    }
+                }
+            }
+            if(startSize != cList.Count) {
+                return;
+            }
+        }
+
+        public void DrawAll(SpriteBatch batch) {
+            int startSize = cList.Count;
+            foreach(List<Component> list in cList.Values) {
+                int innerSize = list.Count;
+                foreach(Component component in list) {
+                    if(component is IDrawComponent) {
+                        (component as IDrawComponent).Draw(batch);
                         if(innerSize != list.Count) {
                             return;
                         }
@@ -73,23 +91,6 @@ namespace CybrEngine {
                     return;
                 }
             }
-
-            public void DrawAll(SpriteBatch batch) {
-                int startSize = cList.Count;
-                foreach(List<Component> list in cList.Values) {
-                    int innerSize = list.Count;
-                    foreach(Component component in list) {
-                        if(component is IDrawComponent) {
-                            (component as IDrawComponent).Draw(batch);
-                            if(innerSize != list.Count) {
-                                return;
-                            }
-                        }
-                    }
-                    if(startSize != cList.Count) {
-                        return;
-                    }
-                }
         }
     }
-    }
+}

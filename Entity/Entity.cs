@@ -21,6 +21,7 @@ namespace CybrEngine {
         protected Entity(){
             handler = ObjectHandler.Instance;
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
+            Transform = new Transform();
         }
 
         public abstract void Awake();
@@ -38,19 +39,19 @@ namespace CybrEngine {
             Destroyed = true;
         }
 
-        public static void Instantiate(Type entity){
-            handler.Instantiate(entity);
-        }
-
         //Adds new Component to Entity
-        public T AddComponenent<T>(T component) where T : Component{
-            return handler.AddComponent(ComponentIndex, component);
+        public T AddComponent<T>() where T : Component{
+            return handler.AddComponent<T>(ComponentIndex);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T: Component{
             Debug.WriteLine(typeof(T));
             return handler.GetComponent<T>(ComponentIndex);
+        }
+
+        public List<T> GetComponents<T>() where T: Component{
+            return handler.GetComponents<T>(ComponentIndex);
         }
 
     }

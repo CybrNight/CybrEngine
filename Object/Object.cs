@@ -25,6 +25,12 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
+        public static Object Instantiate<T>() where T : Object {
+            return handler.Instantiate<T>();
+        }
+
+        public bool Active { get; set; } = true;
+
         public bool IsDestroyed {
             get {
                 return Destroyed || BeingDestroyed;

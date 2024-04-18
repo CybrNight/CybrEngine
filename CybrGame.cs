@@ -16,17 +16,27 @@ namespace CybrEngine
 
 
         protected abstract bool LoadGameContent();
-        protected abstract void GameInit();
+        protected abstract bool GameInit();
+        protected abstract bool GameStart();
+
+        protected abstract void GameUpdate();
+        protected abstract void GameDraw();
+        protected abstract void GameStop();
+
+        private bool GameRunning {  get; set; }
 
         public CybrGame() : base(){ 
             graphics = new GraphicsDeviceManager(this);
-            handler = ObjectHandler.Instance;
 
             Content.RootDirectory = "Content";
-
             Assets.Content = Content;
+            handler = ObjectHandler.Instance;
 
             IsMouseVisible = true;
+        }
+
+        public Object Instantiate<T>() where T : Object {
+            return handler.Instantiate<T>();
         }
 
         protected override void Initialize()
@@ -41,7 +51,9 @@ namespace CybrEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             if(LoadGameContent())
-               GameInit();
+                if (GameInit()){
+                    GameRunning = GameStart();   
+                }
             else 
                Exit();
             // TODO: use this.Content to load your game content here
@@ -56,6 +68,7 @@ namespace CybrEngine
 
         protected override void Update(GameTime gameTime)
         {
+
             if(gameTime.ElapsedGameTime.TotalSeconds > 0.1) {
                 accumulator = 0;
                 previousT = 0;
@@ -79,23 +92,25 @@ namespace CybrEngine
 
             accumulator += frameTime;
 
-            handler.Update();
+            if(GameRunning)
+                GameUpdate();
+                handler.Update();
 
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime)
-        {
+        protected override void Draw(GameTime gameTime){
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            handler.Draw(spriteBatch);
+            
+            if (GameRunning){
+                GameDraw();
+                handler.Draw(spriteBatch);
+            }
 
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
-        }
-
-        protected void Instantiate(Type entity){
-            handler.Instantiate(entity);
         }
     }
 }
