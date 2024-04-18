@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 
 namespace CybrEngine {
-    public class Assets {
+    public static class Assets {
         private static Dictionary<string, Texture2D> sprites = new Dictionary<string, Texture2D>();
         public static ContentManager Content;
 

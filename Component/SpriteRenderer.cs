@@ -20,7 +20,7 @@ namespace CybrEngine {
         }
         
         public Transform Transform { get; set; }
-        public Vector2 Scale { get; set; }
+        public Vector2 Scale { get; set; } = Vector2.One;
         public Vector2 Offset { get; set; }
         public Texture2D Tex { get; private set; }
 
@@ -33,15 +33,6 @@ namespace CybrEngine {
         }
 
         public void Draw(SpriteBatch batch) { 
-            batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            RasterizerState state = new RasterizerState();
-            state.FillMode = FillMode.WireFrame;
-            batch.GraphicsDevice.RasterizerState = state;
-
-            //loop this for all sprites!
-            batch.Draw(Tex, Transform.Position, Color.White);
-            batch.End();
-
             batch.Begin();
             batch.Draw(Tex, Transform.Position, null, Color.White, 0f,
             new Vector2(0, 0),

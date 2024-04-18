@@ -64,7 +64,7 @@ namespace CybrEngine {
             foreach(List<Component> list in cList.Values) {
                 int innerSize = list.Count;
                 foreach(Component component in list) {
-                    //(component).Update();
+                    (component).Update();
                     if(innerSize != list.Count) {
                         return;
                     }

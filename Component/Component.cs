@@ -12,7 +12,7 @@ namespace CybrEngine {
 
         protected readonly Type _cgroup;
 
-        //public abstract void Update();
+        public virtual void Update() { }
 
         public string Name { get; set; }
         public Entity Owner { get; set; }

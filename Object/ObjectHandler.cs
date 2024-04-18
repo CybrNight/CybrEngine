@@ -140,9 +140,12 @@ namespace CybrEngine {
 
                 if (e.Active){
                     e.Update();
-
-                    //pHandler.Update(components[e.ComponentIndex]);
                 }
+            }
+
+            for(int i = 0; i < components.Count; i++) {
+                var c = components[i];
+                c.UpdateAll();
             }
         }
 
