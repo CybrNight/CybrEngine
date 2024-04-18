@@ -31,6 +31,10 @@ namespace CybrEngine {
             get { return _sprite; }
         }
 
+        public override void Update(){
+            Position += Velocity;
+        }
+
         public bool Intersects(Transform other) {
             return Bounds.Intersects(other.Bounds);
         }
