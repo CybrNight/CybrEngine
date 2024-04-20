@@ -20,9 +20,27 @@ namespace CybrEngine {
         public virtual Type ComponentGroup { get { return typeof(IComponent);} }
         public virtual void Init() { }
 
+        public override bool Equals(object obj) {
+            return obj is Component component &&
+                   Name == component.Name &&
+                   EqualityComparer<Entity>.Default.Equals(Owner, component.Owner);
+        }
+
+        public override int GetHashCode() {
+            return HashCode.Combine(Name, Owner);
+        }
+
         // Overload bool to allow null checks
         public static implicit operator bool(Component component) {
             return (component != null);
+        }
+
+        public static bool operator ==(Component left, Component right) {
+            return EqualityComparer<Component>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(Component left, Component right) {
+            return !(left == right);
         }
     }
 }

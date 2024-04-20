@@ -147,6 +147,21 @@ namespace CybrEngine {
                 var c = components[i];
                 c.UpdateAll();
             }
+
+            for (int i = 0;i < objectList.Count; i++) {
+                Transform t1 = objectList[i].Transform; 
+                for (int j = 0; j < objectList.Count; j++) {
+                    Transform t2 = objectList[j].Transform;
+                    
+                    if (t1 != t2){
+                        if (t1.Intersects(t2)) {
+                            Debug.WriteLine("I'mHere");
+                            t1.Owner.OnIntersection(t2);
+                            t2.Owner.OnIntersection(t1);
+                        }
+                    }
+                }
+            }
         }
 
         public void Draw(SpriteBatch batch) {

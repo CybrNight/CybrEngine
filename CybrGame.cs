@@ -50,12 +50,16 @@ namespace CybrEngine
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            if(LoadGameContent())
-                if (GameInit()){
-                    GameRunning = GameStart();   
+            //After core content loaded, tell game to load unique assets
+            if(LoadGameContent()){
+                if(GameInit()) { //If content loaded, tell game to init
+                    GameRunning = GameStart();
                 }
-            else 
-               Exit();
+            } 
+            
+            if (!GameRunning){
+                Exit();
+            }
             // TODO: use this.Content to load your game content here
         }
 

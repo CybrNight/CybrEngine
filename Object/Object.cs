@@ -9,9 +9,11 @@ namespace CybrEngine {
 
         protected static ObjectHandler handler;
 
+        public string Name {  get; protected set; }
+
         protected bool Destroyed { get; set; }
         protected bool BeingDestroyed { get; set; }
-        private int ID { get; set; }
+        public int ID { get; private set; }
         private static int GLOBAL_ID { get; set; } = 0;
 
         public virtual void Destroy() { Destroyed = true; }

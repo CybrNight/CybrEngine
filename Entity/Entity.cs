@@ -8,25 +8,24 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        //Private references to engine systems
-        private Texture2D _sprite;
-        public int ComponentIndex { get; protected set; }
+        //Private references to engine syst
+        public int ComponentIndex { get; private set; }
         private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
 
-        public Transform Transform { get; protected set; }
-        public Texture2D sprite {
-            get { return _sprite; }
-        }
+        public Transform Transform { get; private set; }
 
         protected Entity(){
             handler = ObjectHandler.Instance;
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
             Transform = new Transform();
+            Name = nameof(Entity);
         }
 
         public abstract void Awake();
         public abstract void Start();
         public abstract void Update();
+
+        public virtual void OnIntersection(Transform other){ }
      
 
         public virtual void Draw(SpriteBatch batch){
