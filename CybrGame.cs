@@ -35,7 +35,7 @@ namespace CybrEngine
             IsMouseVisible = true;
         }
 
-        public Object Instantiate<T>() where T : Object {
+        public T Instantiate<T>() where T : Entity {
             return handler.Instantiate<T>();
         }
 

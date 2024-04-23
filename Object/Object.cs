@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Object {
 
-        protected static ObjectHandler handler;
+        internal static ObjectHandler handler;
 
         public string Name {  get; protected set; }
 
@@ -27,8 +28,12 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        public static Object Instantiate<T>() where T : Object {
+        public static Object Instantiate<T>() where T : Entity {
             return handler.Instantiate<T>();
+        }
+
+        public static T Instantiate<T>(Vector2 position) where T : Entity {
+            return handler.Instantiate<T>(position);
         }
 
         public bool Active { get; set; } = true;

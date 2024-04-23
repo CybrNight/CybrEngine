@@ -6,25 +6,54 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class ObjectHandler {
+    internal interface IHandler {
+        public bool Enabled { get; set; }
+    }
 
-        public class PhysicsHandler {
+    internal class ObjectHandler : IHandler {
+
+        public bool Enabled { get; set; } = true;
+
+        /// <summary>
+        /// Holds physics logic separate from ObjectHandler
+        /// Facilitates
+        /// </summary>
+        public class PhysicsHandler : IHandler {
+
+            public bool Enabled { get; set; } = true;
 
             private List<Transform> transforms = new List<Transform>();
 
-            public PhysicsHandler() { 
-                
+            public PhysicsHandler() {
+
             }
 
-            public void Update(ComponentList cList) {
-                List<Transform> list = cList.GetComponents<Transform>();   
+            public void Update() {
+                //Update all entity positions
+                for (int i = 0; i < objectList.Count; i++){
+                    Entity e = objectList[i];
+                    if (e.Active){
+                        e.Position += e.Velocity;
+                    }
+                }
 
-                foreach (Transform transform in list){
-                    transform.Position += transform.Velocity;
+                //Check for entity intersections
+                for(int i = 0; i < objectList.Count; i++) {
+                    Entity e1 = objectList[i];
+                    for(int j = 0; j < objectList.Count; j++) {
+                        Entity e2 = objectList[j];
+                        if (e1 != e2){
+                            if (e1.Intersects(e2)){
+                                e1.OnIntersection(e2);
+                                e2.OnIntersection(e1);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -36,6 +65,10 @@ namespace CybrEngine {
 
         private PhysicsHandler pHandler;
         private static ObjectHandler _instance;
+
+        /// <summary>
+        // Get static reference to ObjectHandler
+        /// </summary>
         public static ObjectHandler Instance {
             get {
                 if(_instance == null) {
@@ -50,7 +83,51 @@ namespace CybrEngine {
         }
 
         /// <summary>
-        /// Method to handle instantiating all queued objects from last cycle
+        /// Method that handles updating all entities
+        /// </summary>
+        public void Update() {
+            InstantiateQueuedObjects(); //Instantiate all new entities
+
+            if (!Enabled){
+                return;
+            }
+
+            for(int i = 0; i < objectList.Count; i++) {
+                Entity e = objectList[i];
+
+                //Cleanup entity if marked for destruction
+                if(e.IsDestroyed) {
+                    int index = e.ComponentIndex;
+                    objectList.Remove(e);
+                    components[index].Destroy();
+                    components.RemoveAt(index);
+                }
+
+                if(e.Active) {
+                    e.Update();
+                }
+            }
+
+            if (pHandler.Enabled){
+                pHandler.Update();
+            }
+
+            for(int i = 0; i < components.Count; i++) {
+                var c = components[i];
+                c.UpdateAll();
+            }
+        }
+
+        public void Draw(SpriteBatch batch) {
+
+            for(int i = 0; i < components.Count; i++) {
+                var c = components[i];
+                c.DrawAll(batch);
+            }
+        }
+
+        /// <summary>
+        /// Method to handle instantiating all queued objects from last update
         /// </summary>
         private void InstantiateQueuedObjects(){
             while (creationQueue.Count > 0) {
@@ -68,9 +145,17 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Object Instantiate<T>() where T : Object {
-            Entity entity = (Entity)Activator.CreateInstance(typeof(T));
+        public T Instantiate<T>() where T : Entity {
+            T entity = (T)Activator.CreateInstance(typeof(T));
             creationQueue.Enqueue(entity); 
+            components.Add(new ComponentList(entity));
+            return entity;
+        }
+
+        public T Instantiate<T>(Vector2 position) where T : Entity {
+            T entity = (T)Activator.CreateInstance(typeof(T));
+            entity.Position = position;
+            creationQueue.Enqueue(entity);
             components.Add(new ComponentList(entity));
             return entity;
         }
@@ -119,57 +204,6 @@ namespace CybrEngine {
         public T RegisterComponent<T>(T component, int CINDEX) where T : Component {
             ComponentList cList = components[CINDEX];
             return cList.AddComponent(component);
-        }
-
-        /// <summary>
-        /// Method that handles updating all entities
-        /// </summary>
-        public void Update() {
-            InstantiateQueuedObjects(); //Instantiate all new entities
-
-            for(int i = 0; i < objectList.Count; i++) {
-                Entity e = objectList[i];
-
-                //Cleanup entity if marked for destruction
-                if(e.IsDestroyed) {
-                    int index = e.ComponentIndex;
-                    objectList.Remove(e);
-                    components[index].Destroy();
-                    components.RemoveAt(index);
-                }
-
-                if (e.Active){
-                    e.Update();
-                }
-            }
-
-            for(int i = 0; i < components.Count; i++) {
-                var c = components[i];
-                c.UpdateAll();
-            }
-
-            for (int i = 0;i < objectList.Count; i++) {
-                Transform t1 = objectList[i].Transform; 
-                for (int j = 0; j < objectList.Count; j++) {
-                    Transform t2 = objectList[j].Transform;
-                    
-                    if (t1 != t2){
-                        if (t1.Intersects(t2)) {
-                            Debug.WriteLine("I'mHere");
-                            t1.Owner.OnIntersection(t2);
-                            t2.Owner.OnIntersection(t1);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void Draw(SpriteBatch batch) {
-
-            for(int i = 0; i < components.Count; i++) {
-                var c = components[i];
-                c.DrawAll(batch);
-            }
         }
     }
 }

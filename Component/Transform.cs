@@ -47,7 +47,7 @@ namespace CybrEngine {
         }
 
         public void OnIntersection(Transform other){
-            Owner.OnIntersection(other);
+            Owner.OnIntersection(other.Owner);
         }
 
         public override Type ComponentGroup {

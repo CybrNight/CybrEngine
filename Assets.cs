@@ -9,12 +9,12 @@ namespace CybrEngine {
         private static Dictionary<string, Texture2D> sprites = new Dictionary<string, Texture2D>();
         public static ContentManager Content;
 
-        public static void LoadSprite(string name, string path) {
+        public static void LoadTexture(string name, string path) {
             Texture2D sprite = Content.Load<Texture2D>(path);
             sprites.Add(name, sprite);
         }
 
-        public static void RemoveSprite(string name) { 
+        public static void DisposeTexture(string name) { 
             var sprite = sprites[name];
             if (sprite != null) {
                 sprites.Remove(name);
