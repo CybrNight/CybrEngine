@@ -12,8 +12,6 @@ namespace CybrEngine {
         private Vector2 _scale = Vector2.One;
         private Vector2 _position = Vector2.Zero;
 
-        private Texture2D _sprite;
-
         public Transform() { Name = "Transform"; }
      
 
@@ -29,10 +27,6 @@ namespace CybrEngine {
         public Vector2 Scale { get; set; } = Vector2.One;
         public Rectangle Bounds { get; private set; } 
 
-        public Texture2D sprite {
-            get { return _sprite; }
-        }
-
         public override void Update() {
             Position += Velocity;
         }
@@ -47,10 +41,10 @@ namespace CybrEngine {
         }
 
         public void OnIntersection(Transform other){
-            Owner.OnIntersection(other.Owner);
+            Entity.OnIntersection(other.Entity);
         }
 
-        public override Type ComponentGroup {
+        public override Type ComponentType {
             get { return typeof(IComponent); }
         }
     };
