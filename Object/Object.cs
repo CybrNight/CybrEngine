@@ -8,15 +8,29 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Object {
 
-        internal static ObjectHandler handler;
+        internal static EntityHandler handler;
 
         public string Name {  get; protected set; }
 
+        private bool Active { get; set; } = true;
         protected bool Destroyed { get; set; }
         protected bool BeingDestroyed { get; set; }
         public int ID { get; private set; }
         private static int GLOBAL_ID { get; set; } = 0;
 
+
+
+        public bool IsActive {
+            get { return Active || IsDestroyed; }
+        }
+
+        public bool IsDestroyed {
+            get {
+                return Destroyed;
+            }
+        }
+
+        public void SetActive(){ Active = true; }
         public virtual void Destroy() { Destroyed = true; }
 
         public override bool Equals(object obj) {
@@ -36,16 +50,8 @@ namespace CybrEngine {
             return handler.Instantiate<T>(position);
         }
 
-        public bool Active { get; set; } = true;
-
-        public bool IsDestroyed {
-            get {
-                return Destroyed || BeingDestroyed;
-            }
-        }
-
         protected Object(){
-            handler = ObjectHandler.Instance;
+            handler = EngineHandler.Instance.GetHandler<EntityHandler>();
             ID = GLOBAL_ID++;
         }
 

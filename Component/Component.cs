@@ -15,19 +15,21 @@ namespace CybrEngine {
         public virtual void Update() { }
 
         public string Name { get; set; }
-        public Entity Owner { get; set; }
+        public Entity Entity { get; set; }
         public bool Unique { get; set; }
-        public virtual Type ComponentGroup { get { return typeof(IComponent);} }
-        public virtual void Init() { }
+        public virtual Type ComponentType { get { return typeof(IComponent);} }
+
+        public virtual void Init(Entity entity) { Entity = entity; }
+        public virtual void Destroy(){ Entity = null; }
 
         public override bool Equals(object obj) {
             return obj is Component component &&
                    Name == component.Name &&
-                   EqualityComparer<Entity>.Default.Equals(Owner, component.Owner);
+                   EqualityComparer<Entity>.Default.Equals(Entity, component.Entity);
         }
 
         public override int GetHashCode() {
-            return HashCode.Combine(Name, Owner);
+            return HashCode.Combine(Name, Entity);
         }
 
         // Overload bool to allow null checks

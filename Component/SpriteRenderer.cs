@@ -15,12 +15,14 @@ namespace CybrEngine {
             
         }
 
+       
         public SpriteRenderer(Texture2D tex){
             Tex = tex;
         }
         
         public Transform Transform { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
+
         public Vector2 Offset { get; set; }
         public Texture2D Tex { get; private set; }
 
@@ -32,20 +34,22 @@ namespace CybrEngine {
             Tex = Assets.GetTexture(path);
         }
 
-        public void Draw(SpriteBatch batch) { 
-            batch.Begin();
-            batch.Draw(Tex, Transform.Position, null, Color.White, 0f,
-            new Vector2(0, 0),
-            Scale,
+        public override void Destroy(){
+            Tex = null;
+            Transform = null;
+            base.Destroy();
+        }
+
+        public void Draw(SpriteBatch spriteBatch) { 
+            spriteBatch.Draw(Tex, Transform.Position, null, Color.White, 0f,
+            Transform.Origin,
+            Transform.Scale,
             SpriteEffects.None,
             0f);
-            batch.End();
         }
 
-        public override Type ComponentGroup {
+        public override Type ComponentType {
             get { return typeof(IDrawComponent); }
         }
-
-        public Entity Entity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     };
 }

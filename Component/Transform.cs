@@ -8,44 +8,38 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class Transform : Component {
-        private Vector2 _scale = Vector2.One;
+    public class Transform {
+        
         private Vector2 _position = Vector2.Zero;
+        public Vector2 Position { 
+            get { return _position; } 
+            set {
+                _position = value;
+                Bounds = new Rectangle(((int)_position.X) + Bounds.X,
+                                       ((int)_position.Y) + Bounds.Y,
+                                       Bounds.Width, Bounds.Height); 
+            } 
+        }
+        
+        public Vector2 Origin { get; set; }
 
-        public Transform() { Name = "Transform"; }
-     
+        public Vector2 Velocity { get; set; } 
+        public Vector2 Scale { get; set; }
+        public Rectangle Bounds { get; set; }
 
-        public Transform(Vector2 position) {
-            Position = position;
-            Unique = true;
+        ~Transform(){
+
         }
 
         public Transform(float x, float y) : this(new Vector2(x, y)) { }
 
-        public Vector2 Position { get { return _position; } set { UpdatePosition(value); } }
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
-        public Vector2 Scale { get; set; } = Vector2.One;
-        public Rectangle Bounds { get; private set; } 
+        public Transform(Vector2 position = new Vector2()) {
+            Position = position;
+            Bounds = new Rectangle(0, 0, 32, 32);
+            Origin = new Vector2(Bounds.Width / 2, Bounds.Height / 2);
+            Scale = Vector2.One;
 
-        public override void Update() {
-            Position += Velocity;
-        }
-
-        private void UpdatePosition(Vector2 pos){
-            _position = pos;
-            Bounds = new Rectangle(((int)Position.X), ((int)Position.Y), 32, 32);
-        }
-
-        public bool Intersects(Transform other) {
-            return Bounds.Intersects(other.Bounds);
-        }
-
-        public void OnIntersection(Transform other){
-            Entity.OnIntersection(other.Entity);
-        }
-
-        public override Type ComponentType {
-            get { return typeof(IComponent); }
+            Velocity = Vector2.Zero;
         }
     };
 }

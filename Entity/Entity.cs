@@ -15,11 +15,19 @@ namespace CybrEngine {
         public Transform Transform { get; private set; }
 
         /// <summary>
-        /// Exposes Transform position value
+        /// Get Position of Entity Transform
         /// </summary>
         public Vector2 Position { 
             get { return Transform.Position; } 
             set { Transform.Position = value; } 
+        }
+
+        /// <summary>
+        /// Get Bounds of Entity Transform
+        /// </summary>
+        public Rectangle Bounds { 
+            get { return Transform.Bounds; }
+            set { Transform.Bounds = value; }
         }
 
         public Vector2 Velocity{
@@ -28,31 +36,26 @@ namespace CybrEngine {
         }
 
         public bool Intersects(Entity other) {
-            return Transform.Intersects(other.Transform);
+            return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
         protected Entity() {
-            handler = ObjectHandler.Instance;
+            handler = EngineHandler.Instance.GetHandler<EntityHandler>();
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
             Transform = new Transform();
             Name = nameof(Entity);
         }
 
+        //TODO : Make these private and call Entity internal methods via reflection
         public abstract void Awake();
         public abstract void Start();
         public abstract void Update();
+        public virtual void FixedUpdate() { }
 
         public virtual void OnIntersection(Entity other) { }
-        
-
-
-        public virtual void Draw(SpriteBatch batch) {
-            // cList.DrawAll(batch);
-        }
 
         public override void Destroy() {
             BeingDestroyed = true;
-
             Destroyed = true;
         }
 
@@ -63,7 +66,6 @@ namespace CybrEngine {
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            Debug.WriteLine(typeof(T));
             return handler.GetComponent<T>(ComponentIndex);
         }
 

@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace CybrEngine
 {
@@ -10,7 +12,7 @@ namespace CybrEngine
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private ObjectHandler handler;
+        private EngineHandler handler;
 
         private int fixedUpdateRate;
 
@@ -23,6 +25,8 @@ namespace CybrEngine
         protected abstract void GameDraw();
         protected abstract void GameStop();
 
+        private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
+
         private bool GameRunning {  get; set; }
 
         public CybrGame() : base(){ 
@@ -30,19 +34,32 @@ namespace CybrEngine
 
             Content.RootDirectory = "Content";
             Assets.Content = Content;
-            handler = ObjectHandler.Instance;
+
+            handler = EngineHandler.Instance;
+            handler.AddHandler<EntityHandler>();
+            handler.AddHandler<InputHandler>();
+            //cHandler = ComponentHandler.Instance;
+
 
             IsMouseVisible = true;
         }
 
         public T Instantiate<T>() where T : Entity {
-            return handler.Instantiate<T>();
+            return handler.GetHandler<EntityHandler>().Instantiate<T>();
         }
 
-        protected override void Initialize()
+        protected sealed override void Initialize()
         {
             // TODO: Add your initialization logic here
-            fixedUpdateRate = (int)(60 == 0 ? 0 : (1000 / (float)60));
+            fixedUpdateRate = (int)(Config.FIXED_UPDATE_FPS == 0 ? 0 : (1000 / (float)Config.FIXED_UPDATE_FPS));
+            Time.fixedUpdateRate = TimeSpan.FromTicks((long)TimeSpan.TicksPerSecond / Config.FIXED_UPDATE_FPS);
+            Time.fixedUpdateMult = (float)DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
+
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferWidth = Config.RES_X;
+            graphics.PreferredBackBufferHeight = Config.RES_Y;
+            graphics.ApplyChanges();
+
             base.Initialize();
         }
 
@@ -60,7 +77,6 @@ namespace CybrEngine
             if (!GameRunning){
                 Exit();
             }
-            // TODO: use this.Content to load your game content here
         }
 
 
@@ -81,24 +97,33 @@ namespace CybrEngine
 
             if(previousT == 0) {
                 fixedUpdateDelta = fixedUpdateRate;
-                previousT = (float)gameTime.TotalGameTime.TotalMilliseconds;
+                previousT = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
+            Time.Update(ref gameTime);
 
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-
-            Globals.ElapsedTime = elapsedTime;
-            Globals.GameTime = gameTime;
             float now = (float)gameTime.TotalGameTime.TotalMilliseconds;
-            float frameTime = now - previousT;
-            if(frameTime > maxFrameTime)
-                frameTime = maxFrameTime;
+            Time.frameTime = now - previousT;
+
+            if(Time.frameTime > maxFrameTime) {
+                Time.frameTime = maxFrameTime;
+            }
             previousT = now;
 
-            accumulator += frameTime;
+            accumulator += Time.frameTime;
 
-            if(GameRunning)
-                GameUpdate();
+            if(GameRunning) {
                 handler.Update();
+                GameUpdate();
+
+                while (accumulator >= fixedUpdateDelta){
+                    handler.FixedUpdate();
+                    Time.FixedUpdate(ref gameTime);
+                    fixedUpdateElapsedTime += fixedUpdateDelta;
+                    accumulator -= fixedUpdateDelta;
+                }
+            }
+
+            Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
 
             base.Update(gameTime);
         }
@@ -108,8 +133,8 @@ namespace CybrEngine
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
             if (GameRunning){
+                handler.GetHandler<EntityHandler>().Draw(spriteBatch);
                 GameDraw();
-                handler.Draw(spriteBatch);
             }
 
             // TODO: Add your drawing code here

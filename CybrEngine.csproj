@@ -8,6 +8,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Input\" />
+    <Folder Include="Singleton\" />
   </ItemGroup>
 </Project>
