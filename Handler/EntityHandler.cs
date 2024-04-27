@@ -94,16 +94,14 @@ namespace CybrEngine {
 
         public override void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Begin();
-            int startSize = entities.Count;
-            foreach(Entity e in entities) {
+            for (int i = 0; i < entities.Count;){ 
+                Entity e = entities[i];
                 if(e.IsActive) {
                     int index = e.ComponentIndex;
                     if(components.ContainsKey(index)) {
                         components[index].DrawAll(spriteBatch);
                     }
                 }
-
-                if(startSize != entities.Count) { return; }
             }
             spriteBatch.End();
         }
@@ -122,13 +120,19 @@ namespace CybrEngine {
 
         }
 
+        private T CreateInstance<T>() where T : Entity {
+            var deps = new object[] { typeof(T).ToString(), this, new Transform(0, 0) };
+            T instance = (T)Activator.CreateInstance(typeof(T), deps);
+            return instance;
+        }
+
         /// <summary>
         /// Adds new Entity to creationQueue, creates new ComponentList entry and returns reference to new Entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Entity Instantiate<T>() where T : Entity {
-            T entity = (T)Activator.CreateInstance(typeof(T), true);
+        public T Instantiate<T>() where T : Entity {
+            T entity = CreateInstance<T>();
             creationQueue.Enqueue(entity);
             components[entity.ComponentIndex] = (new ComponentList(entity));
             return entity;
@@ -141,10 +145,8 @@ namespace CybrEngine {
         /// <param name="position"></param>
         /// <returns></returns>
         public T Instantiate<T>(Vector2 position) where T : Entity {
-            T entity = (T)Activator.CreateInstance(typeof(T));
+            T entity = Instantiate<T>();
             entity.Position = position;
-            creationQueue.Enqueue(entity);
-            components[entity.ComponentIndex] = (new ComponentList(entity));
             return entity;
         }
 
@@ -155,7 +157,7 @@ namespace CybrEngine {
         /// <param name="CINDEX"></param>
         /// <returns></returns>
         public T GetComponent<T>(int CINDEX) where T : Component {
-            if(CINDEX >= components.Count) {
+            if(!components.ContainsKey(CINDEX)) {
                 return null;
             }
 
@@ -192,7 +194,7 @@ namespace CybrEngine {
             }
 
             //Create new instance of Component T
-            T newComp = (T)Activator.CreateInstance(typeof(T));
+            T newComp = (T)Activator.CreateInstance(typeof(T), true);
             return components[CINDEX].AddComponent(newComp);
         }
     }

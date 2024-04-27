@@ -41,11 +41,12 @@ namespace CybrEngine {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
-        protected Entity(string name, EntityHandler entityHandler, Transform transform) {
+        public Entity(string name, EntityHandler entityHandler, Transform transform) {
             Name = name;
             Handler = entityHandler;
             Transform = transform;
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
+            Transform = new Transform();
         }
 
         //TODO : Make these private and call Entity internal methods via reflection
