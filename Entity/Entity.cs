@@ -8,7 +8,7 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        EntityHandler handler;
+        private EntityHandler Handler { get; set; }
 
         //Private references to engine syst
         public int ComponentIndex { get; private set; }
@@ -41,11 +41,11 @@ namespace CybrEngine {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
-        protected Entity() {
-            handler = Handlers.GetHandler<EntityHandler>();
+        protected Entity(string name, EntityHandler entityHandler, Transform transform) {
+            Name = name;
+            Handler = entityHandler;
+            Transform = transform;
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
-            Transform = new Transform();
-            Name = nameof(Entity);
         }
 
         //TODO : Make these private and call Entity internal methods via reflection
@@ -63,16 +63,16 @@ namespace CybrEngine {
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return handler.AddComponent<T>(ComponentIndex);
+            return Handler.AddComponent<T>(ComponentIndex);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return handler.GetComponent<T>(ComponentIndex);
+            return Handler.GetComponent<T>(ComponentIndex);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return handler.GetComponents<T>(ComponentIndex);
+            return Handler.GetComponents<T>(ComponentIndex);
         }
 
         public override bool Equals(object obj) {

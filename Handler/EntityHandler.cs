@@ -128,7 +128,7 @@ namespace CybrEngine {
         /// <param name="entity"></param>
         /// <returns></returns>
         public Entity Instantiate<T>() where T : Entity {
-            T entity = (T)Activator.CreateInstance(typeof(T));
+            T entity = (T)Activator.CreateInstance(typeof(T), true);
             creationQueue.Enqueue(entity);
             components[entity.ComponentIndex] = (new ComponentList(entity));
             return entity;
