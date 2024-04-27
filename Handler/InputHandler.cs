@@ -14,7 +14,7 @@ namespace CybrEngine {
         private static InputHandler _inputHandler;
 
         static Input() {
-            _inputHandler = EngineHandler.Instance.GetHandler<InputHandler>();
+            _inputHandler = Handlers.GetHandler<InputHandler>();
         }
 
         public static bool GetKey(Keys key) {

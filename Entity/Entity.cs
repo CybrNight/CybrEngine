@@ -8,6 +8,8 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
+        EntityHandler handler;
+
         //Private references to engine syst
         public int ComponentIndex { get; private set; }
         private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
@@ -40,7 +42,7 @@ namespace CybrEngine {
         }
 
         protected Entity() {
-            handler = EngineHandler.Instance.GetHandler<EntityHandler>();
+            handler = Handlers.GetHandler<EntityHandler>();
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
             Transform = new Transform();
             Name = nameof(Entity);

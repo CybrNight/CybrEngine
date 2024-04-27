@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Object {
 
-        internal static EntityHandler handler;
+        private EntityHandler eHandler;
 
         public string Name {  get; protected set; }
 
@@ -17,8 +17,6 @@ namespace CybrEngine {
         protected bool BeingDestroyed { get; set; }
         public int ID { get; private set; }
         private static int GLOBAL_ID { get; set; } = 0;
-
-
 
         public bool IsActive {
             get { return Active || IsDestroyed; }
@@ -42,16 +40,16 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        public static Object Instantiate<T>() where T : Entity {
-            return handler.Instantiate<T>();
+        protected Object Instantiate<T>() where T : Entity {
+            return eHandler.Instantiate<T>();
         }
 
-        public static T Instantiate<T>(Vector2 position) where T : Entity {
-            return handler.Instantiate<T>(position);
+        protected T Instantiate<T>(Vector2 position) where T : Entity {
+            return eHandler.Instantiate<T>(position);
         }
 
         protected Object(){
-            handler = EngineHandler.Instance.GetHandler<EntityHandler>();
+            eHandler = Handlers.GetHandler<EntityHandler>();
             ID = GLOBAL_ID++;
         }
 

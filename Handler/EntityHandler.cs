@@ -19,9 +19,6 @@ namespace CybrEngine {
         /// </summary>
         public class PhysicsHandler : Handler {
 
-            public PhysicsHandler() {
-
-            }
 
             public override void FixedUpdate() {
                 //Update all entity positions
@@ -60,14 +57,7 @@ namespace CybrEngine {
         private static Dictionary<int, ComponentList> components = new Dictionary<int, ComponentList>();
 
         public EntityHandler() {
-            EngineHandler.Instance.AddHandler<PhysicsHandler>();
-        }
-
-        /// <summary>
-        /// Expose PhysicsHandler FixedUpdate()
-        /// </summary>
-        public override void FixedUpdate() {
-
+            Handlers.AddHandler<PhysicsHandler>();
         }
 
         /// <summary>
@@ -137,7 +127,7 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public T Instantiate<T>() where T : Entity {
+        public Entity Instantiate<T>() where T : Entity {
             T entity = (T)Activator.CreateInstance(typeof(T));
             creationQueue.Enqueue(entity);
             components[entity.ComponentIndex] = (new ComponentList(entity));

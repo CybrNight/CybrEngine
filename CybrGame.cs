@@ -2,17 +2,20 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
 namespace CybrEngine
 {
+    /// <summary>
+    /// Class defining custom Game type
+    /// Allows for different Game to be swapped out
+    /// </summary>
     public abstract class CybrGame : Game
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-
-        private EngineHandler handler;
 
         private int fixedUpdateRate;
 
@@ -35,17 +38,16 @@ namespace CybrEngine
             Content.RootDirectory = "Content";
             Assets.Content = Content;
 
-            handler = EngineHandler.Instance;
-            handler.AddHandler<EntityHandler>();
-            handler.AddHandler<InputHandler>();
-            //cHandler = ComponentHandler.Instance;
+            Handlers.AddHandler<ObjectHandler>();
+            Handlers.AddHandler<InputHandler>();
+            Handlers.AddHandler<EntityHandler>();
 
 
             IsMouseVisible = true;
         }
 
-        public T Instantiate<T>() where T : Entity {
-            return handler.GetHandler<EntityHandler>().Instantiate<T>();
+        public Object Instantiate<T>() where T : Entity {
+            return Handlers.GetHandler<EntityHandler>().Instantiate<T>();
         }
 
         protected sealed override void Initialize()
@@ -112,11 +114,11 @@ namespace CybrEngine
             accumulator += Time.frameTime;
 
             if(GameRunning) {
-                handler.Update();
+                Handlers.Update();
                 GameUpdate();
 
                 while (accumulator >= fixedUpdateDelta){
-                    handler.FixedUpdate();
+                    Handlers.FixedUpdate();
                     Time.FixedUpdate(ref gameTime);
                     fixedUpdateElapsedTime += fixedUpdateDelta;
                     accumulator -= fixedUpdateDelta;
@@ -133,7 +135,7 @@ namespace CybrEngine
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
             if (GameRunning){
-                handler.GetHandler<EntityHandler>().Draw(spriteBatch);
+                Handlers.Draw(spriteBatch);
                 GameDraw();
             }
 
