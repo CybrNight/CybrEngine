@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Object {
 
-        private EntityHandler eHandler;
+        protected EntityHandler eHandler;
+        protected ComponentHandler cHandler;
 
         public string Name {  get; protected set; }
 
@@ -51,6 +52,8 @@ namespace CybrEngine {
 
         protected Object(){
             eHandler = Handlers.GetHandler<EntityHandler>();
+            cHandler = Handlers.GetHandler<ComponentHandler>();
+
             ID = GLOBAL_ID++;
         }
 

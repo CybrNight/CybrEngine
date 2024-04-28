@@ -19,24 +19,24 @@ namespace CybrEngine {
         public Vector2 Scale { get; set; } = Vector2.One;
 
         public Vector2 Offset { get; set; }
-        public Texture2D Tex { get; private set; }
+        public Texture2D Texture { get; private set; } 
 
         public Rectangle Bounds{
-            get { return Tex.Bounds; }
+            get { return Texture.Bounds; }
         }
 
         public void SetTexture(string path){
-            Tex = Assets.GetTexture(path);
+            Texture = Assets.GetTexture(path);
         }
 
         public override void Destroy(){
-            Tex = null;
+            Texture = null;
             Transform = null;
             base.Destroy();
         }
 
         public void Draw(SpriteBatch spriteBatch) {
-            spriteBatch.Draw(Tex, Transform.Position, null, Color.White, 0f,
+            spriteBatch.Draw(Texture, Transform.Position, null, Color.White, 0f,
             Transform.Origin,
             Transform.Scale,
             SpriteEffects.None,

@@ -101,7 +101,7 @@ namespace CybrEngine {
         private void InstantiateQueuedEntities() {
             while(creationQueue.Count > 0) {
                 var obj = creationQueue.Dequeue();
-                obj.Awake();
+                obj.Construct();
                 entities.Add(obj);
                 obj.Start();
             }

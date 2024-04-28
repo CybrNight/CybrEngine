@@ -8,8 +8,6 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        private ComponentHandler Handler { get; set; }
-
         //Private references to engine syst
         public int ComponentIndex { get; private set; }
         private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
@@ -17,7 +15,7 @@ namespace CybrEngine {
         public Transform Transform { get; private set; }
 
         //Define built-in reference to Component SpriteRenderer
-        public SpriteRenderer SpriteRenderer { get; protected set; }
+        public SpriteRenderer SpriteRenderer { get; private set; }
 
         /// <summary>
         /// Get Position of Entity Transform
@@ -44,13 +42,17 @@ namespace CybrEngine {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
-        public Entity() {
-            Handler = Handlers.GetHandler<ComponentHandler>();
+        protected Entity() {
             Transform = new Transform();
-            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
         }
 
         //TODO : Make these private and call Entity internal methods via reflection
+        public void Construct() {
+            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
+            SpriteRenderer = AddComponent<SpriteRenderer>();
+            SpriteRenderer.Transform = Transform;
+            Awake();
+        }
         public abstract void Awake();
         public abstract void Start();
         public abstract void Update();
@@ -59,21 +61,21 @@ namespace CybrEngine {
         public virtual void OnIntersection(Entity other) { }
 
         protected override void Cleanup() {
-            Handler.DestroyMap(ID);            
+            cHandler.DestroyMap(ID);            
         }
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return Handler.AddComponent<T>(ID);
+            return cHandler.AddComponent<T>(ID);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return Handler.GetComponent<T>(ID);
+            return cHandler.GetComponent<T>(ID);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return Handler.GetComponents<T>(ID);
+            return cHandler.GetComponents<T>(ID);
         }
 
         public override bool Equals(object obj) {
