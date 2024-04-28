@@ -14,11 +14,6 @@ namespace CybrEngine {
             Name = "SpriteRenderer";
             
         }
-
-       
-        public SpriteRenderer(Texture2D tex){
-            Tex = tex;
-        }
         
         public Transform Transform { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
@@ -40,7 +35,7 @@ namespace CybrEngine {
             base.Destroy();
         }
 
-        public void Draw(SpriteBatch spriteBatch) { 
+        public void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Draw(Tex, Transform.Position, null, Color.White, 0f,
             Transform.Origin,
             Transform.Scale,

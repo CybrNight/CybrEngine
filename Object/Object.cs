@@ -29,7 +29,8 @@ namespace CybrEngine {
         }
 
         public void SetActive(){ Active = true; }
-        public virtual void Destroy() { Destroyed = true; }
+        public void Destroy() { BeingDestroyed = true; Cleanup(); Destroyed = true; }
+        protected virtual void Cleanup(){ }
 
         public override bool Equals(object obj) {
             return obj is Object @object &&

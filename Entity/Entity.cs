@@ -8,13 +8,16 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        private EntityHandler Handler { get; set; }
+        private ComponentHandler Handler { get; set; }
 
         //Private references to engine syst
         public int ComponentIndex { get; private set; }
         private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
 
         public Transform Transform { get; private set; }
+
+        //Define built-in reference to Component SpriteRenderer
+        public SpriteRenderer SpriteRenderer { get; protected set; }
 
         /// <summary>
         /// Get Position of Entity Transform
@@ -41,12 +44,10 @@ namespace CybrEngine {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
-        public Entity(string name, EntityHandler entityHandler, Transform transform) {
-            Name = name;
-            Handler = entityHandler;
-            Transform = transform;
-            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
+        public Entity() {
+            Handler = Handlers.GetHandler<ComponentHandler>();
             Transform = new Transform();
+            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
         }
 
         //TODO : Make these private and call Entity internal methods via reflection
@@ -57,23 +58,22 @@ namespace CybrEngine {
 
         public virtual void OnIntersection(Entity other) { }
 
-        public override void Destroy() {
-            BeingDestroyed = true;
-            Destroyed = true;
+        protected override void Cleanup() {
+            Handler.DestroyMap(ID);            
         }
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return Handler.AddComponent<T>(ComponentIndex);
+            return Handler.AddComponent<T>(ID);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return Handler.GetComponent<T>(ComponentIndex);
+            return Handler.GetComponent<T>(ID);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return Handler.GetComponents<T>(ComponentIndex);
+            return Handler.GetComponents<T>(ID);
         }
 
         public override bool Equals(object obj) {
@@ -85,6 +85,10 @@ namespace CybrEngine {
 
         public override int GetHashCode() {
             return HashCode.Combine(base.GetHashCode(), Name, ID);
+        }
+
+        public static implicit operator bool(Entity e){
+            return (e != null);
         }
 
         public static bool operator ==(Entity left, Entity right) {

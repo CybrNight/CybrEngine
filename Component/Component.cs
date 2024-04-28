@@ -22,6 +22,7 @@ namespace CybrEngine {
         public virtual void Init(Entity entity) { Entity = entity; }
         public virtual void Destroy(){ Entity = null; }
 
+
         public override bool Equals(object obj) {
             return obj is Component component &&
                    Name == component.Name &&

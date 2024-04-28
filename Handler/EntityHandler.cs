@@ -54,8 +54,6 @@ namespace CybrEngine {
         private static List<Entity> entities = new List<Entity>();
         private static Queue<Entity> creationQueue = new Queue<Entity>();
 
-        private static Dictionary<int, ComponentList> components = new Dictionary<int, ComponentList>();
-
         public EntityHandler() {
             Handlers.AddHandler<PhysicsHandler>();
         }
@@ -76,8 +74,6 @@ namespace CybrEngine {
                     //Remove Entity, and Destory ComponentList
                     int index = e.ComponentIndex;
                     entities.Remove(e);
-                    components[index].Destroy();
-                    components.Remove(index);
                     continue;
                 }
 
@@ -85,25 +81,17 @@ namespace CybrEngine {
                 if(e.IsActive) {
                     int index = e.ComponentIndex;
                     e.Update();
-                    if(components.ContainsKey(index)) {
-                        components[e.ComponentIndex].UpdateAll();
-                    }
                 }
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            spriteBatch.Begin();
-            for (int i = 0; i < entities.Count;){ 
+            for (int i = 0; i < entities.Count; i++){ 
                 Entity e = entities[i];
                 if(e.IsActive) {
                     int index = e.ComponentIndex;
-                    if(components.ContainsKey(index)) {
-                        components[index].DrawAll(spriteBatch);
-                    }
                 }
             }
-            spriteBatch.End();
         }
 
 
@@ -120,21 +108,14 @@ namespace CybrEngine {
 
         }
 
-        private T CreateInstance<T>() where T : Entity {
-            var deps = new object[] { typeof(T).ToString(), this, new Transform(0, 0) };
-            T instance = (T)Activator.CreateInstance(typeof(T), deps);
-            return instance;
-        }
-
         /// <summary>
         /// Adds new Entity to creationQueue, creates new ComponentList entry and returns reference to new Entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public T Instantiate<T>() where T : Entity {
-            T entity = CreateInstance<T>();
+            T entity = Builder.Entity<T>();
             creationQueue.Enqueue(entity);
-            components[entity.ComponentIndex] = (new ComponentList(entity));
             return entity;
         }
 
@@ -150,6 +131,8 @@ namespace CybrEngine {
             return entity;
         }
 
+        /*
+         * ==== DEPRECATED =====
         /// <summary>
         /// Returns specified component for CINDEX passed from entity
         /// </summary>
@@ -196,6 +179,6 @@ namespace CybrEngine {
             //Create new instance of Component T
             T newComp = (T)Activator.CreateInstance(typeof(T), true);
             return components[CINDEX].AddComponent(newComp);
-        }
+        }*/
     }
 }

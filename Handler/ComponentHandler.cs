@@ -1,95 +1,123 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    internal class ComponentHandler : Handler {
+    public class ComponentHandler : Handler {
 
-        private Dictionary<Type, Dictionary<int, Component>> componentList;
+        private Dictionary<int, List<Component>> componentMap;
 
         public ComponentHandler() {
-            componentList = new Dictionary<Type, Dictionary<int, Component>>();
+            componentMap = new Dictionary<int, List<Component>>();
         }
 
-        public override void Update() {
-            int startSize = componentList.Count;
-            foreach(var dict in componentList.Values){
-                int innerSize = dict.Count;
-                foreach(var component in dict.Values){
-                    component.Update();    
+        public void DestroyMap(int id){
+            if (componentMap.ContainsKey(id)){
+                for (int i = 0; i < componentMap[id].Count; i++){
+                    componentMap[id][i].Destroy();
+                }
+                componentMap.Remove(id);
+            }
+        }
 
-                    if (innerSize != dict.Count){
+        /// <summary>
+        /// Updates all Components in componentMap
+        /// </summary>
+        public override void Update() {
+            int startSize = componentMap.Count;
+            foreach(var pair in componentMap){
+                var cList = pair.Value;
+                int innerSize = cList.Count;
+                for (int i = 0; i < cList.Count ; i++){
+                    var component = cList[i];
+                    component.Update();
+
+                    if(innerSize != cList.Count) {
                         return;
                     }
                 }
-
-                if (startSize != componentList.Count){
+              
+                if (startSize != componentMap.Count){
                     return;
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Draws all Components in componentMap of type IDrawComponent
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch) {
-            int startSize = componentList.Count;
-            foreach(var dict in componentList.Values) {
-                int innerSize = dict.Count;
-                foreach(var component in dict.Values) {  
+            int startSize = componentMap.Count;
+            foreach(var cList in componentMap.Values) {
+                int innerSize = cList.Count;
+                for (int i = 0; i < cList.Count; i++) {
+                    var component = cList[i]; 
                     if (component is IDrawComponent){
                         (component as IDrawComponent).Draw(spriteBatch);
                     }
 
-                    if(innerSize != dict.Count) {
+                    if(innerSize != cList.Count) {
                         return;
                     }
                 }
 
-                if(startSize != componentList.Count) {
+                if(startSize != componentMap.Count) {
                     return;
                 }
             }
-        }
-
-        public Component BuildComponent<T>() where T : Component {
-            T newComponent = (T)Activator.CreateInstance(typeof(T), true);
-            return newComponent;
         }
 
         /// <summary>
         /// Creates Component ot type T and binds to Entity at index CINDEX
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="CINDEX"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public T AddComponent<T>(int CINDEX) where T : Component {
-            var ctype = typeof(T);
-            var newComponent = BuildComponent<T>();
-            if(!componentList.ContainsKey(ctype)) {
-                componentList[ctype] = new Dictionary<int, Component>();
+        public T AddComponent<T>(int id) where T : Component {
+            var newComponent = Builder.Component<T>(id);
+            if(!componentMap.ContainsKey(id)) {
+                componentMap[id] = new List<Component>();
             }
-            componentList[ctype][CINDEX] = newComponent;
-            return (T)newComponent;
+            componentMap[id].Add(newComponent);
+            return newComponent;
         }
 
         /// <summary>
         /// Retrieves Component of type T from Entity at CINDEX
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="CINDEX"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public T GetComponent<T>(int CINDEX) where T : Component {
-            var ctype = typeof(T);
-            if(!componentList.ContainsKey(ctype)) {
+        public T GetComponent<T>(int id) where T : Component {
+            if(!componentMap.ContainsKey(id)) {
                 return null;
             }
 
-            var dict = componentList[ctype];
-            if(dict.ContainsKey(CINDEX)) {
-                return (T)dict[CINDEX];
+            var cList = componentMap[id];
+            return (T)cList.Find(e => e is T);
+        }
+
+        public List<T> GetComponents<T>(int id) where T : Component{
+            if (!componentMap.ContainsKey(id)) {
+                return null;
             }
-            return null;
+
+            var cList = componentMap[id];
+            List<T> result = new List<T>();
+
+            for(int i = 0; i < cList.Count; i++) {
+                var component = cList[i];
+                if(component is T) {
+                    result.Add((T)component);
+                }
+            }
+            return result;
         }
     }
 }

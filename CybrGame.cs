@@ -41,6 +41,7 @@ namespace CybrEngine
             Handlers.AddHandler<ObjectHandler>();
             Handlers.AddHandler<InputHandler>();
             Handlers.AddHandler<EntityHandler>();
+            Handlers.AddHandler<ComponentHandler>();
 
 
             IsMouseVisible = true;
@@ -131,14 +132,14 @@ namespace CybrEngine
         }
 
         protected override void Draw(GameTime gameTime){
-
-            GraphicsDevice.Clear(Color.CornflowerBlue);
             
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
             if (GameRunning){
                 Handlers.Draw(spriteBatch);
                 GameDraw();
             }
-
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
