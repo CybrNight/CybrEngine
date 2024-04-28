@@ -13,49 +13,12 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public class EntityHandler : Handler {
 
-        /// <summary>
-        /// Holds physics logic separate from ObjectHandler
-        /// Facilitates
-        /// </summary>
-        public class PhysicsHandler : Handler {
-
-
-            public override void FixedUpdate() {
-                //Update all entity positions
-
-
-                for(int i = 0; i < entities.Count; i++) {
-                    Entity e = entities[i];
-
-                    if(e.IsActive) {
-                        e.FixedUpdate();
-                        e.Position = new Vector2(e.Position.X + e.Velocity.X * Time.deltaTime,
-                                                 e.Position.Y - e.Velocity.Y * Time.deltaTime);
-                    }
-
-                }
-
-                //Check for entity intersections
-                for(int i = 0; i < entities.Count; i++) {
-                    Entity e1 = entities[i];
-                    for(int j = 0; j < entities.Count; j++) {
-                        Entity e2 = entities[j];
-                        if(e1 != e2) {
-                            if(e1.Intersects(e2)) {
-                                e1.OnIntersection(e2);
-                                e2.OnIntersection(e1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+     
         private static List<Entity> entities = new List<Entity>();
         private static Queue<Entity> creationQueue = new Queue<Entity>();
 
         public EntityHandler() {
-            Handlers.AddHandler<PhysicsHandler>();
+            
         }
 
         /// <summary>
@@ -63,8 +26,9 @@ namespace CybrEngine {
         /// </summary>
         public override void Update() {
             //Instantiate all Entites queued from last update
-            if(entities.Count < 500)
-                InstantiateQueuedEntities();
+            InstantiateQueuedEntities();
+
+            Debug.WriteLine(entities.Count);
 
             int startSize = entities.Count;
             for(int i = 0; i < entities.Count; i++) {
@@ -81,6 +45,33 @@ namespace CybrEngine {
                 if(e.IsActive) {
                     int index = e.ComponentIndex;
                     e.Update();
+                }
+            }
+        }
+
+        public override void FixedUpdate() {
+            for(int i = 0; i < entities.Count; i++) {
+                Entity e = entities[i];
+
+                if(e.IsActive) {
+                    e.FixedUpdate();
+                    e.Position = new Vector2(e.Position.X + e.Velocity.X * Time.deltaTime,
+                                             e.Position.Y - e.Velocity.Y * Time.deltaTime);
+                }
+
+            }
+            return;
+            //Check for entity intersections
+            for(int i = 0; i < entities.Count; i++) {
+                Entity e1 = entities[i];
+                for(int j = 0; j < entities.Count; j++) {
+                    Entity e2 = entities[j];
+                    if(e1 != e2) {
+                        if(e1.Intersects(e2)) {
+                            e1.OnIntersection(e2);
+                            e2.OnIntersection(e1);
+                        }
+                    }
                 }
             }
         }

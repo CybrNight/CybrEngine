@@ -13,7 +13,6 @@ namespace CybrEngine {
 
         public abstract void Destroy();
         public bool Unique { get; protected set;  }
-        public Entity Entity { get; protected set; }
         public string Name { get; protected set; }
     }
 }

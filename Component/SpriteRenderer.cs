@@ -36,6 +36,9 @@ namespace CybrEngine {
         }
 
         public void Draw(SpriteBatch spriteBatch) {
+            if (Texture == null) return;
+
+
             spriteBatch.Draw(Texture, Transform.Position, null, Color.White, 0f,
             Transform.Origin,
             Transform.Scale,

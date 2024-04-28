@@ -30,7 +30,6 @@ namespace CybrEngine {
         /// </summary>
         public Rectangle Bounds { 
             get { return Transform.Bounds; }
-            set { Transform.Bounds = value; }
         }
 
         public Vector2 Velocity{

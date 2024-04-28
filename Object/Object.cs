@@ -50,6 +50,10 @@ namespace CybrEngine {
             return eHandler.Instantiate<T>(position);
         }
 
+        protected T Instantiate<T>(float x, float y) where T : Entity{
+            return eHandler.Instantiate<T>(new Vector2(x, y));
+        }
+
         protected Object(){
             eHandler = Handlers.GetHandler<EntityHandler>();
             cHandler = Handlers.GetHandler<ComponentHandler>();
