@@ -6,16 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public abstract class Handler {
-
-
-        public bool Enabled { get; set; } = true;
-
-        /// <summary>
-        /// Called every game tick
-        /// </summary>
-        public virtual void Update() { }
-
+    public abstract class Handler : Object { 
         /// <summary>
         /// Called every physics tick
         /// </summary>
@@ -25,6 +16,10 @@ namespace CybrEngine {
         /// Called every draw tick
         /// </summary>
         public virtual void Draw(SpriteBatch spriteBatch) { }
+
+        /// <summary>
+        /// Called after Handler 
+        /// </summary>
 
         protected Handler(){ }
     }

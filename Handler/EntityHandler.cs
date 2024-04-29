@@ -1,1 +1,117 @@
-﻿using Microsoft.Xna.Framework;using Microsoft.Xna.Framework.Graphics;using System;using System.Collections;using System.Collections.Generic;using System.Diagnostics;using System.Linq;using System.Reflection;using System.Security.Cryptography;using System.Text;using System.Threading.Tasks;namespace CybrEngine {    public class EntityHandler : Handler {             private static List<Entity> entities = new List<Entity>();        private static Queue<Entity> creationQueue = new Queue<Entity>();        public EntityHandler() {                    }        /// <summary>        /// Method that handles updating all Entities        /// </summary>        public override void Update() {            //Instantiate all Entites queued from last update            InstantiateQueuedEntities();            Debug.WriteLine(entities.Count);            int startSize = entities.Count;            for(int i = 0; i < entities.Count; i++) {                Entity e = entities[i];                if(e.IsDestroyed) {                    //Remove Entity, and Destory ComponentList                    int index = e.ComponentIndex;                    entities.Remove(e);                    continue;                }                //If Entity Active, Update()                if(e.IsActive) {                    int index = e.ComponentIndex;                    e.Update();                }            }        }        public override void FixedUpdate() {            for(int i = 0; i < entities.Count; i++) {                Entity e = entities[i];                if(e.IsActive) {                    e.FixedUpdate();                    e.Position = new Vector2(e.Position.X + e.Velocity.X * Time.deltaTime,                                             e.Position.Y - e.Velocity.Y * Time.deltaTime);                }            }            //Check for entity intersections            for(int i = 0; i < entities.Count; i++) {                Entity e1 = entities[i];                for(int j = 0; j < entities.Count; j++) {                    Entity e2 = entities[j];                    if(e1 != e2) {                        if(e1.Intersects(e2)) {                            e1.OnIntersection(e2);                            e2.OnIntersection(e1);                        }                    }                }            }        }        public override void Draw(SpriteBatch spriteBatch) {            for (int i = 0; i < entities.Count; i++){                 Entity e = entities[i];                if(e.IsActive) {                    int index = e.ComponentIndex;                }            }        }        /// <summary>        /// Method to handle instantiating all queued objects from last update        /// </summary>        private void InstantiateQueuedEntities() {            while(creationQueue.Count > 0) {                var obj = creationQueue.Dequeue();                obj.Construct();                entities.Add(obj);                obj.Start();            }        }        /// <summary>        /// Adds new Entity to creationQueue, creates new ComponentList entry and returns reference to new Entity        /// </summary>        /// <param name="entity"></param>        /// <returns></returns>        public T Instantiate<T>() where T : Entity {            T entity = Builder.Entity<T>();            creationQueue.Enqueue(entity);            return entity;        }        /// <summary>        /// Adds new Entity object to creationQueue wih position        /// </summary>        /// <typeparam name="T"></typeparam>        /// <param name="position"></param>        /// <returns></returns>        public T Instantiate<T>(Vector2 position) where T : Entity {            T entity = Instantiate<T>();            entity.Position = position;            return entity;        }    }}
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CybrEngine {
+    public class EntityHandler : Handler {
+
+
+        private static List<Object> entities = new List<Object>();
+        private static Queue<Object> creationQueue = new Queue<Object>();
+
+        public EntityHandler() {
+
+        }
+
+        public override void _Awake() {
+
+        }
+
+        public override void _Start() {
+
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            var cList = entities.FindAll(e => e is Component);
+            for(int i = 0; i < cList.Count; i++) {
+                var component = cList[i];
+                if(component is IDrawComponent) {
+                    (component as IDrawComponent).Draw(spriteBatch);
+                }
+            }
+        }
+
+        public override void _Update() {
+            //Instantiate all Entites queued from last update
+            InstantiateQueuedEntities();
+            Debug.WriteLine(entities.Count);
+
+            int startSize = entities.Count;
+            for(int i = 0; i < entities.Count; i++) {
+                var e = entities[i];
+
+                if(!e.IsCreated) {
+                    e.Start();
+                }
+
+                if(e.IsDestroyed) {
+                    //Remove Entity, and Destory ComponentList
+                    int index = e.ID;
+                    entities.Remove(e);
+                } else if(e.IsActive) {
+                    int index = e.ID;
+                    e._Update();
+                }
+            }
+        }
+
+        public override void FixedUpdate() {
+            var ents = entities.FindAll(e => e is Entity);
+            for(int i = 0; i < ents.Count; i++) {
+                var e1 = ents[i] as Entity;
+
+                if(e1.IsActive) {
+                    e1.FixedUpdate();
+                    e1.Position = new Vector2(e1.Position.X + e1.Velocity.X * Time.deltaTime,
+                                             e1.Position.Y - e1.Velocity.Y * Time.deltaTime);
+
+                    for(int j = 0; j < ents.Count; j++) {
+                        var e2 = ents[j] as Entity;
+                        if(e1 != e2) {
+                            if(e1.Intersects(e2)) {
+                                e1.OnIntersection(e2);
+                                e2.OnIntersection(e1);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        private void InstantiateQueuedEntities() {
+            while(creationQueue.Count > 0) {
+                var obj = creationQueue.Dequeue();
+                if(obj is Entity) {
+                    (obj as Entity).Construct();
+                }
+                entities.Add(obj);
+                obj.Awake();
+            }
+        }
+
+        public void AddObjectInstance(Object obj){
+            creationQueue.Enqueue(obj);
+        }
+
+        public T Instantiate<T>() where T : Object {
+            T entity = Builder.Object<T>();
+            creationQueue.Enqueue(entity);
+            return entity;
+        }
+
+        public T Instantiate<T>(Vector2 position) where T : Entity{
+            T entity = Instantiate<T>();
+            entity.Position = position;
+            return entity;
+        }
+    }
+}

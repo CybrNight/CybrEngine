@@ -24,7 +24,7 @@ namespace CybrEngine {
             }*/
         }
 
-        public override void Update() {
+        public override void _Update() {
             /*int startSize = handlers.Count;
             foreach(Handler handler in handlers.Values) {
                 if(!handler.Enabled) continue;

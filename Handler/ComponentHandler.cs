@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,14 @@ namespace CybrEngine {
             componentMap = new Dictionary<int, List<Component>>();
         }
 
+        public override void _Start() {
+           
+        }
+
+        public override void _Awake() {
+           
+        }
+
         public void DestroyMap(int id){
             if (componentMap.ContainsKey(id)){
                 for (int i = 0; i < componentMap[id].Count; i++){
@@ -28,24 +37,8 @@ namespace CybrEngine {
         /// <summary>
         /// Updates all Components in componentMap
         /// </summary>
-        public override void Update() {
-            int startSize = componentMap.Count;
-            foreach(var pair in componentMap){
-                var cList = pair.Value;
-                int innerSize = cList.Count;
-                for (int i = 0; i < cList.Count ; i++){
-                    var component = cList[i];
-                    component.Update();
-
-                    if(innerSize != cList.Count) {
-                        return;
-                    }
-                }
-              
-                if (startSize != componentMap.Count){
-                    return;
-                }
-            }
+        public override void _Update() {
+            
         }
         
         /// <summary>
@@ -85,6 +78,7 @@ namespace CybrEngine {
                 componentMap[id] = new List<Component>();
             }
             componentMap[id].Add(newComponent);
+            Handlers.GetHandler<EntityHandler>().AddObjectInstance(newComponent);
             return newComponent;
         }
 

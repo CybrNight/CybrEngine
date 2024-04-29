@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     public abstract class Object {
 
-        protected EntityHandler eHandler;
-        protected ComponentHandler cHandler;
+        public string Name { get; protected set; }
 
-        public string Name {  get; protected set; }
+        private bool Active { get; set; } = false;
 
-        private bool Active { get; set; } = true;
+        public bool IsCreated { get; private set; } = false;
         protected bool Destroyed { get; set; }
         protected bool BeingDestroyed { get; set; }
         public int ID { get; private set; }
@@ -25,13 +24,36 @@ namespace CybrEngine {
 
         public bool IsDestroyed {
             get {
-                return Destroyed;
+                return BeingDestroyed || Destroyed;
             }
         }
 
-        public void SetActive(){ Active = true; }
-        public void Destroy() { BeingDestroyed = true; Cleanup(); Destroyed = true; }
-        protected virtual void Cleanup(){ }
+        public void Awake() {
+            if(IsCreated) return;
+
+            _Awake();
+            Active = true;
+        }
+
+        public void Start() {
+            if(IsCreated) return;
+            _Start();
+            IsCreated = true;
+        }
+
+        public virtual void _Awake() { }
+        public virtual void _Start() { }
+        public virtual void _Update() { }
+
+        public void SetActive(bool value = true) { Active = value; }
+        public void Destroy() { BeingDestroyed = true; _Cleanup(); Destroyed = true; }
+
+        public void Cleanup() {
+            if(BeingDestroyed && Destroyed) return;
+            _Cleanup();
+        }
+
+        protected virtual void _Cleanup() { }
 
         public override bool Equals(object obj) {
             return obj is Object @object &&
@@ -42,21 +64,8 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        protected Object Instantiate<T>() where T : Entity {
-            return eHandler.Instantiate<T>();
-        }
+        protected Object() {
 
-        protected T Instantiate<T>(Vector2 position) where T : Entity {
-            return eHandler.Instantiate<T>(position);
-        }
-
-        protected T Instantiate<T>(float x, float y) where T : Entity{
-            return eHandler.Instantiate<T>(new Vector2(x, y));
-        }
-
-        protected Object(){
-            eHandler = Handlers.GetHandler<EntityHandler>();
-            cHandler = Handlers.GetHandler<ComponentHandler>();
 
             ID = GLOBAL_ID++;
         }

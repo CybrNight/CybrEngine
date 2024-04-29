@@ -17,7 +17,7 @@ namespace CybrEngine {
         }
 
         public static T Object<T>(object[] deps = null) where T : Object {
-            T newComponent = (T)Activator.CreateInstance(typeof(T), true, deps);
+            T newComponent = (T)Activator.CreateInstance(typeof(T), true);
             return newComponent;
         }
     }

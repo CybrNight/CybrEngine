@@ -42,6 +42,7 @@ namespace CybrEngine
             Handlers.AddHandler<InputHandler>();
             Handlers.AddHandler<EntityHandler>();
             Handlers.AddHandler<ComponentHandler>();
+            Handlers.Update();
 
 
             IsMouseVisible = true;
@@ -72,6 +73,7 @@ namespace CybrEngine
             
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()){
+
                 if(GameInit()) { //If content loaded, tell game to init
                     GameRunning = GameStart();
                 }

@@ -66,7 +66,7 @@ namespace CybrEngine {
         }
 
         //Update all input Dictionary
-        public override void Update() {
+        public override void _Update() {
             _inputMap.Update();
 
             var kstate = Keyboard.GetState();
@@ -113,11 +113,12 @@ namespace CybrEngine {
 
         //Check if Key is currently pressed
         public bool GetKey(Keys key) {
+            var kstate = Keyboard.GetState();
             if(!pressedKeys.ContainsKey(key)) {
                 return false;
             }
 
-            return (pressedKeys[key] > 0);
+            return (kstate.IsKeyDown(key)) ;
         }
 
         //Gets current state of a Key as Int

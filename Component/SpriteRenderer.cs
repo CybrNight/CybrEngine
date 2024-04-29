@@ -29,10 +29,9 @@ namespace CybrEngine {
             Texture = Assets.GetTexture(path);
         }
 
-        public override void Destroy(){
+        protected override void _Cleanup (){
             Texture = null;
             Transform = null;
-            base.Destroy();
         }
 
         public void Draw(SpriteBatch spriteBatch) {

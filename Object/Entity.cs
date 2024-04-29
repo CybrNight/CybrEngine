@@ -8,6 +8,9 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
+        protected EntityHandler eHandler;
+        protected ComponentHandler cHandler;
+
         //Private references to engine syst
         public int ComponentIndex { get; private set; }
         private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
@@ -47,19 +50,19 @@ namespace CybrEngine {
 
         //TODO : Make these private and call Entity internal methods via reflection
         public void Construct() {
+            eHandler = Handlers.GetHandler<EntityHandler>();
+            cHandler = Handlers.GetHandler<ComponentHandler>();
+
             ComponentIndex = GLOBAL_COMPONENT_INDEX++;
             SpriteRenderer = AddComponent<SpriteRenderer>();
             SpriteRenderer.Transform = Transform;
-            Awake();
         }
-        public abstract void Awake();
-        public abstract void Start();
-        public abstract void Update();
+
         public virtual void FixedUpdate() { }
 
         public virtual void OnIntersection(Entity other) { }
 
-        protected override void Cleanup() {
+        protected override void _Cleanup() {
             cHandler.DestroyMap(ID);            
         }
 
@@ -86,6 +89,18 @@ namespace CybrEngine {
 
         public override int GetHashCode() {
             return HashCode.Combine(base.GetHashCode(), Name, ID);
+        }
+
+        protected Entity Instantiate<T>() where T : Entity {
+            return eHandler.Instantiate<T>();
+        }
+
+        protected T Instantiate<T>(Vector2 position) where T : Entity {
+            return eHandler.Instantiate<T>(position);
+        }
+
+        protected T Instantiate<T>(float x, float y) where T : Entity {
+            return eHandler.Instantiate<T>(new Vector2(x, y));
         }
 
         public static implicit operator bool(Entity e){

@@ -11,12 +11,29 @@ namespace CybrEngine {
     public static class Handlers {
         private static Dictionary<Type, Handler> handlers = new Dictionary<Type, Handler>();
 
+        private static Queue<Handler> creationQueue = new Queue<Handler>();
+
+        private static void ConstructHandlers(){
+            while (creationQueue.Count > 0){
+                var handler = creationQueue.Dequeue();
+                handlers[handler.GetType()] = handler;
+                handler.Awake();
+            }
+        }
+
         public static void Update() {
+            if (creationQueue.Count > 0){
+                ConstructHandlers();
+                return;
+            }
+
             int startSize = handlers.Count;
             foreach(Handler handler in handlers.Values) {
-                if(!handler.Enabled) continue;
+                if (!handler.IsActive && !handler.IsCreated){
+                    handler.Start();    
+                }
 
-                handler.Update();
+                handler._Update();
 
                 if(startSize != handlers.Count) {
                     return;
@@ -32,7 +49,7 @@ namespace CybrEngine {
         public static void FixedUpdate(){
             int startSize = handlers.Count;
             foreach(Handler handler in handlers.Values) {
-                if(!handler.Enabled) continue;
+                if(!handler.IsActive) continue;
 
                 handler.FixedUpdate();
 
@@ -45,7 +62,7 @@ namespace CybrEngine {
         public static void Draw(SpriteBatch spriteBatch) {
             int startSize = handlers.Count;
             foreach(Handler handler in handlers.Values) {
-                if(!handler.Enabled) continue;
+                if(!handler.IsActive) continue;
 
                 handler.Draw(spriteBatch);
 
@@ -62,7 +79,7 @@ namespace CybrEngine {
         /// <returns></returns>
         public static T AddHandler<T>() where T : Handler {
             T handler = (T)Activator.CreateInstance(typeof(T));
-            handlers[typeof(T)] = handler;
+            creationQueue.Enqueue(handler);
             return handler;
         }
 
@@ -84,9 +101,9 @@ namespace CybrEngine {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
-        public static void SetActive<T>(bool value) where T : Handler {
+        public static void SetActive<T>(bool value = true) where T : Handler {
             try {
-                handlers[typeof(T)].Enabled = value;
+                handlers[typeof(T)].SetActive(value);
             } catch(KeyNotFoundException e) {
                 Debug.WriteLine(e.Message + "No handler of type" + typeof(T));
             }

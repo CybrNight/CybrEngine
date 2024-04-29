@@ -8,18 +8,14 @@ using System.Threading.Tasks;
 /// Defines generic Component base class
 /// </summary>
 namespace CybrEngine {
-    public abstract class Component : IComponent {
+    public abstract class Component : Object {
 
         protected readonly Type _cgroup;
 
         public virtual void Update() { }
 
-        public string Name { get; set; }
         public bool Unique { get; set; }
         public virtual Type ComponentType { get { return typeof(IComponent);} }
-
-        public virtual void Destroy() { }
-
 
         public override bool Equals(object obj) {
             return obj is Component component &&
