@@ -52,7 +52,7 @@ namespace CybrEngine {
                 for (int i = 0; i < cList.Count; i++) {
                     var component = cList[i]; 
                     if (component is IDrawComponent){
-                        (component as IDrawComponent).Draw(spriteBatch);
+                        //(component as IDrawComponent).Draw(spriteBatch);
                     }
 
                     if(innerSize != cList.Count) {
@@ -73,12 +73,12 @@ namespace CybrEngine {
         /// <param name="id"></param>
         /// <returns></returns>
         public T AddComponent<T>(int id) where T : Component {
-            var newComponent = Builder.Component<T>(id);
+            var newComponent = Builder.Component<T>();
             if(!componentMap.ContainsKey(id)) {
                 componentMap[id] = new List<Component>();
             }
             componentMap[id].Add(newComponent);
-            Handlers.GetHandler<EntityHandler>().AddObjectInstance(newComponent);
+            Handlers.GetHandler<ObjectHandler>().AddObjectInstance(newComponent);
             return newComponent;
         }
 

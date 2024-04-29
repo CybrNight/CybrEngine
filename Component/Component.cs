@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,10 @@ namespace CybrEngine {
         protected readonly Type _cgroup;
 
         public virtual void Update() { }
+        public virtual void Draw(SpriteBatch spriteBatch){ }
 
         public bool Unique { get; set; }
-        public virtual Type ComponentType { get { return typeof(IComponent);} }
+        public virtual Type ComponentType { get { return typeof(Component);} }
 
         public override bool Equals(object obj) {
             return obj is Component component &&

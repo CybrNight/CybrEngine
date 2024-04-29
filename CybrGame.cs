@@ -38,9 +38,8 @@ namespace CybrEngine
             Content.RootDirectory = "Content";
             Assets.Content = Content;
 
-            Handlers.AddHandler<ObjectHandler>();
             Handlers.AddHandler<InputHandler>();
-            Handlers.AddHandler<EntityHandler>();
+            Handlers.AddHandler<ObjectHandler>();
             Handlers.AddHandler<ComponentHandler>();
             Handlers.Update();
 
@@ -49,7 +48,7 @@ namespace CybrEngine
         }
 
         public Object Instantiate<T>() where T : Entity {
-            return Handlers.GetHandler<EntityHandler>().Instantiate<T>();
+            return Handlers.GetHandler<ObjectHandler>().Instantiate<T>();
         }
 
         protected sealed override void Initialize()

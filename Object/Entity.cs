@@ -8,17 +8,13 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        protected EntityHandler eHandler;
+        protected ObjectHandler eHandler;
         protected ComponentHandler cHandler;
-
-        //Private references to engine syst
-        public int ComponentIndex { get; private set; }
-        private static int GLOBAL_COMPONENT_INDEX { get; set; } = 0;
 
         public Transform Transform { get; private set; }
 
         //Define built-in reference to Component SpriteRenderer
-        public SpriteRenderer SpriteRenderer { get; private set; }
+        public Sprite Sprite { get; private set; }
 
         /// <summary>
         /// Get Position of Entity Transform
@@ -50,12 +46,11 @@ namespace CybrEngine {
 
         //TODO : Make these private and call Entity internal methods via reflection
         public void Construct() {
-            eHandler = Handlers.GetHandler<EntityHandler>();
+            eHandler = Handlers.GetHandler<ObjectHandler>();
             cHandler = Handlers.GetHandler<ComponentHandler>();
 
-            ComponentIndex = GLOBAL_COMPONENT_INDEX++;
-            SpriteRenderer = AddComponent<SpriteRenderer>();
-            SpriteRenderer.Transform = Transform;
+            Sprite = Builder.Component<Sprite>();
+            Sprite.Transform = Transform;
         }
 
         public virtual void FixedUpdate() { }

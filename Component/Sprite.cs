@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class SpriteRenderer : Component, IDrawComponent{
+    public class Sprite : Component, IDrawComponent{
 
-        public SpriteRenderer(){ 
+        public Sprite(){ 
             Name = "SpriteRenderer";
             
         }

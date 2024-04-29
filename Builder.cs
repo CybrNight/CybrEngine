@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace CybrEngine {
     internal static class Builder {
-        public static T Component<T>(int entity) where T : Component {
-            T newComponent = (T)Activator.CreateInstance(typeof(T), true);
-            return newComponent;
+        public static T Component<T>() where T : Component {
+            T component = (T)Activator.CreateInstance(typeof(T), true);
+            return component;
         }
 
         public static T Entity<T>() where T : Entity {
-            T newComponent = (T)Activator.CreateInstance(typeof(T), true);
-            return newComponent;
+            T entity = (T)Activator.CreateInstance(typeof(T), true);
+            return entity;
         }
 
         public static T Object<T>(object[] deps = null) where T : Object {
-            T newComponent = (T)Activator.CreateInstance(typeof(T), true);
-            return newComponent;
+            T obj = (T)Activator.CreateInstance(typeof(T), true);
+            return obj;
         }
     }
 }
