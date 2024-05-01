@@ -1,11 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
     internal static class Builder {
+        public static MethodInfo MethodCall(object instace, string name) {
+            // Get the type of MyClass
+            Type type = instace.GetType();
+
+            // Get the method information using reflection
+            MethodInfo method = type.GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance);
+
+            return method;
+        }
+
         public static T Component<T>() where T : Component {
             T component = (T)Activator.CreateInstance(typeof(T), true);
             return component;

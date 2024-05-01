@@ -8,8 +8,7 @@ using System.Linq;
 namespace CybrEngine {
     public abstract class Entity : Object {
 
-        protected ObjectHandler eHandler;
-        protected ComponentHandler cHandler;
+        internal ObjectHandler objHandler;
 
         public Transform Transform { get; private set; }
 
@@ -40,39 +39,39 @@ namespace CybrEngine {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
+        public virtual void OnIntersection(Entity other) { }
+
         protected Entity() {
+            objHandler = ObjectHandler.Instance;
+            messager = Messager.Instance;
+
             Transform = new Transform();
-        }
-
-        //TODO : Make these private and call Entity internal methods via reflection
-        public void Construct() {
-            eHandler = Handlers.GetHandler<ObjectHandler>();
-            cHandler = Handlers.GetHandler<ComponentHandler>();
-
-            Sprite = Builder.Component<Sprite>();
+            Sprite = new Sprite();
             Sprite.Transform = Transform;
         }
 
         public virtual void FixedUpdate() { }
 
-        public virtual void OnIntersection(Entity other) { }
-
-        protected override void _Cleanup() {
-            cHandler.DestroyMap(ID);            
+        /// <summary>
+        /// Calls private method on Entity
+        /// </summary>
+        /// <param name="name"></param>
+        public override void SendMessage(string name) {
+            messager.SendMessage(this, name);
         }
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return cHandler.AddComponent<T>(ID);
+            return objHandler.AddComponent<T>(ID);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return cHandler.GetComponent<T>(ID);
+            return objHandler.GetComponent<T>(ID);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return cHandler.GetComponents<T>(ID);
+            return objHandler.GetComponents<T>(ID);
         }
 
         public override bool Equals(object obj) {
@@ -87,15 +86,15 @@ namespace CybrEngine {
         }
 
         protected Entity Instantiate<T>() where T : Entity {
-            return eHandler.Instantiate<T>();
+            return objHandler.Instantiate<T>();
         }
 
         protected T Instantiate<T>(Vector2 position) where T : Entity {
-            return eHandler.Instantiate<T>(position);
+            return objHandler.Instantiate<T>(position);
         }
 
         protected T Instantiate<T>(float x, float y) where T : Entity {
-            return eHandler.Instantiate<T>(new Vector2(x, y));
+            return objHandler.Instantiate<T>(new Vector2(x, y));
         }
 
         public static implicit operator bool(Entity e){

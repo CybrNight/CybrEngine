@@ -9,65 +9,73 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace CybrEngine {
-    public class ObjectHandler : Handler {
-
-
-        private static List<Object> objects = new List<Object>();
-        private static Queue<Object> creationQueue = new Queue<Object>();
-
-        public ObjectHandler() {
-
-        }
-
-        public override void _Awake() {
-
-        }
-
-        public override void _Start() {
-
-        }
-
-        public override void Draw(SpriteBatch spriteBatch) {
-            var cList = objects.FindAll(e => e is Entity);
-            for(int i = 0; i < cList.Count; i++) {
-                var component = cList[i] as Entity;
-                component.Sprite.Draw(spriteBatch);
+    internal class ObjectHandler : IMessageable {
+        private static ObjectHandler _instance;
+        public static ObjectHandler Instance {
+            get {
+                if(_instance == null) {
+                    _instance = new ObjectHandler();
+                }
+                return _instance;
             }
         }
 
-        public override void _Update() {
+        private List<Object> objPool;
+        private Queue<Object> creationQueue;
+
+        private ComponentStore store;
+
+
+        private ObjectHandler() {
+            objPool = new List<Object>();
+            creationQueue = new Queue<Object>();
+            store = new ComponentStore();
+        }
+
+        /// <summary>
+        /// Iterates over all Entity in objPool and calls Draw
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void Draw(SpriteBatch spriteBatch) {
+            var cList = objPool.FindAll(e => e is Entity);
+            for(int i = 0; i < cList.Count; i++) {
+                var entity = cList[i] as Entity;
+                entity.Sprite.Draw(spriteBatch);
+            }
+        }
+
+        public void Update() {
             //Instantiate all Entites queued from last update
             InstantiateQueuedObjects();
-            Debug.WriteLine(objects.Count);
+            Debug.WriteLine(objPool.Count);
 
-            int startSize = objects.Count;
-            for(int i = 0; i < objects.Count; i++) {
-                var e = objects[i];
-
+            for(int i = 0; i < objPool.Count; i++) {
+                var e = objPool[i];
                 if(!e.IsCreated) {
-                    e.Start();
+                    e.SendMessage("_Start");
                 }
 
                 if(e.IsDestroyed) {
                     //Remove Entity, and Destory ComponentList
                     int index = e.ID;
-                    objects.Remove(e);
+                    objPool.Remove(e);
+                    store.Remove(index);
                 } else if(e.IsActive) {
-                    int index = e.ID;
-                    e._Update();
+                    e.SendMessage("_Update");
                 }
             }
         }
 
-        public override void FixedUpdate() {
-            var ents = objects.FindAll(e => e is Entity);
+        public void FixedUpdate() {
+            var ents = objPool.FindAll(e => e is Entity);
             for(int i = 0; i < ents.Count; i++) {
                 var e1 = ents[i] as Entity;
 
                 if(e1.IsActive) {
-                    e1.FixedUpdate();
+                    e1.SendMessage("_FixedUpdate()");
                     e1.Position = new Vector2(e1.Position.X + e1.Velocity.X * Time.deltaTime,
                                              e1.Position.Y - e1.Velocity.Y * Time.deltaTime);
 
@@ -88,16 +96,9 @@ namespace CybrEngine {
         private void InstantiateQueuedObjects() {
             while(creationQueue.Count > 0) {
                 var obj = creationQueue.Dequeue();
-                if(obj is Entity) {
-                    (obj as Entity).Construct();
-                }
-                objects.Add(obj);
-                obj.Awake();
+                objPool.Add(obj);
+                obj.SendMessage("_Awake");
             }
-        }
-
-        public void AddObjectInstance(Object obj){
-            creationQueue.Enqueue(obj);
         }
 
         public T Instantiate<T>() where T : Object {
@@ -106,10 +107,28 @@ namespace CybrEngine {
             return entity;
         }
 
-        public T Instantiate<T>(Vector2 position) where T : Entity{
+        public T Instantiate<T>(Vector2 position) where T : Entity {
             T entity = Instantiate<T>();
             entity.Position = position;
             return entity;
+        }
+
+        public T AddComponent<T>(int id) where T : Component {
+            var component = Builder.Component<T>();
+            store.AddComponent(id, component);
+            return component;
+        }
+
+        public T GetComponent<T>(int id) where T : Component {
+            return store.GetComponent<T>(id);
+        }
+
+        public List<T> GetComponents<T>(int id) where T : Component {
+            return store.GetComponents<T>(id);
+        }
+
+        public void SendMessage(string name, object[] args = null) {
+            Messager.Instance.SendMessage(this, name, args);
         }
     }
 }

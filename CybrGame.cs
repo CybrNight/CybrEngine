@@ -17,6 +17,10 @@ namespace CybrEngine
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        private ObjectHandler objHandler;
+        private InputHandler inputHandler;
+        private Messager messager;
+
         private int fixedUpdateRate;
 
 
@@ -38,17 +42,17 @@ namespace CybrEngine
             Content.RootDirectory = "Content";
             Assets.Content = Content;
 
-            Handlers.AddHandler<InputHandler>();
-            Handlers.AddHandler<ObjectHandler>();
-            Handlers.AddHandler<ComponentHandler>();
-            Handlers.Update();
 
+            //Initialize singleton handlers
+            messager = Messager.Instance;
+            inputHandler = InputHandler.Instance;
+            objHandler = ObjectHandler.Instance;
 
             IsMouseVisible = true;
         }
 
         public Object Instantiate<T>() where T : Entity {
-            return Handlers.GetHandler<ObjectHandler>().Instantiate<T>();
+            return ObjectHandler.Instance.Instantiate<T>();
         }
 
         protected sealed override void Initialize()
@@ -116,11 +120,12 @@ namespace CybrEngine
             accumulator += Time.frameTime;
 
             if(GameRunning) {
-                Handlers.Update();
+                objHandler.Update();
+                inputHandler.Update();
                 GameUpdate();
 
                 while (accumulator >= fixedUpdateDelta){
-                    Handlers.FixedUpdate();
+                    objHandler.FixedUpdate();
                     Time.FixedUpdate(ref gameTime);
                     fixedUpdateElapsedTime += fixedUpdateDelta;
                     accumulator -= fixedUpdateDelta;
@@ -137,7 +142,7 @@ namespace CybrEngine
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             if (GameRunning){
-                Handlers.Draw(spriteBatch);
+                objHandler.Draw(spriteBatch);
                 GameDraw();
             }
             spriteBatch.End();

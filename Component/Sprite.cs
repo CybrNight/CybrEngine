@@ -34,7 +34,7 @@ namespace CybrEngine {
             Transform = null;
         }
 
-        public void Draw(SpriteBatch spriteBatch) {
+        public override void Draw(SpriteBatch spriteBatch) {
             if (Texture == null) return;
 
 

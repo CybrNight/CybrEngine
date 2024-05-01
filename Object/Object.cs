@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
     public abstract class Object {
+
+        internal Messager messager;
 
         public string Name { get; protected set; }
 
@@ -28,31 +31,21 @@ namespace CybrEngine {
             }
         }
 
-        public void Awake() {
-            if(IsCreated) return;
-
-            _Awake();
-            Active = true;
-        }
-
         public void Start() {
             if(IsCreated) return;
-            _Start();
             IsCreated = true;
         }
-
-        public virtual void _Awake() { }
-        public virtual void _Start() { }
-        public virtual void _Update() { }
+        
+        public virtual void SendMessage(string name){
+            messager.SendMessage(this, name);
+        }
 
         public void SetActive(bool value = true) { Active = value; }
         public void Destroy() { BeingDestroyed = true; _Cleanup(); Destroyed = true; }
 
-        public void Cleanup() {
-            if(BeingDestroyed && Destroyed) return;
-            _Cleanup();
-        }
-
+        /// <summary>
+        /// Function that handles cleaning up un-managed data
+        /// </summary>
         protected virtual void _Cleanup() { }
 
         public override bool Equals(object obj) {
@@ -65,9 +58,10 @@ namespace CybrEngine {
         }
 
         protected Object() {
-
-
             ID = GLOBAL_ID++;
+            Active = true;
+
+            messager = Messager.Instance;
         }
 
         public static bool operator ==(Object left, Object right) {
