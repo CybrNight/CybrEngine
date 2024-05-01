@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace CybrEngine {
 
@@ -14,7 +11,7 @@ namespace CybrEngine {
         private static InputHandler _inputHandler;
 
         static Input() {
-            _inputHandler = Handlers.GetHandler<InputHandler>();
+            _inputHandler = InputHandler.Instance;
         }
 
         public static bool GetKey(Keys key) {
@@ -27,14 +24,18 @@ namespace CybrEngine {
         public static float GetAxis(string axis) {
             return _inputHandler.GetAxis(axis);
         }
-
-        public static bool IsAction(string action) {
-            return _inputHandler.IsAction(action);
-        }
-
     }
 
-    internal class InputHandler : Handler {
+    internal class InputHandler : IMessageable {
+        private static InputHandler _instance;
+        public static InputHandler Instance {
+            get {
+                if(_instance == null) {
+                    _instance = new InputHandler();
+                }
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// Stores all input axes used by InputHandler
@@ -46,19 +47,13 @@ namespace CybrEngine {
         /// </summary>
         private static Dictionary<Keys, float> pressedKeys = new Dictionary<Keys, float>();
 
-        /// <summary>
-        /// Stores reference to InputMap
-        /// </summary>
-        private static InputMap _inputMap;
-
         //Initialize base Input axes
-        public InputHandler() {
+        private InputHandler() {
             axes = new Dictionary<string, float>();
-            _inputMap = new InputMap();
 
             axes["Horizontal"] = 0;
             axes["Vertical"] = 0;
-            
+
         }
 
         private void ResetKey(Keys key) {
@@ -66,9 +61,7 @@ namespace CybrEngine {
         }
 
         //Update all input Dictionary
-        public override void Update() {
-            _inputMap.Update();
-
+        public void Update() {
             var kstate = Keyboard.GetState();
 
             //Update Horizontal, and Vertical axes with directional int value
@@ -99,10 +92,6 @@ namespace CybrEngine {
 
         }
 
-        public bool IsAction(string action){
-            return _inputMap.IsActionPerformed(action);
-        }
-
         public int GetAxisRaw(string axis) {
             return axes[axis].CeilToInt();
         }
@@ -113,11 +102,12 @@ namespace CybrEngine {
 
         //Check if Key is currently pressed
         public bool GetKey(Keys key) {
+            var kstate = Keyboard.GetState();
             if(!pressedKeys.ContainsKey(key)) {
                 return false;
             }
 
-            return (pressedKeys[key] > 0);
+            return (kstate.IsKeyDown(key));
         }
 
         //Gets current state of a Key as Int
@@ -131,6 +121,10 @@ namespace CybrEngine {
                 return false;
             }
             return (pressedKeys[key] > 1);
+        }
+
+        void IMessageable.SendMessage(string name, object[] args) {
+            Messager.Instance.SendMessage(this, name, args);
         }
     }
 }

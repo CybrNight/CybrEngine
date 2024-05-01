@@ -1,18 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CybrEngine {
     public abstract class Object {
 
-        private EntityHandler eHandler;
+        internal Messager messager;
 
-        public string Name {  get; protected set; }
+        public string Name { get; protected set; }
 
-        private bool Active { get; set; } = true;
+        private bool Active { get; set; } = false;
+
+        public bool IsCreated { get; private set; } = false;
         protected bool Destroyed { get; set; }
         protected bool BeingDestroyed { get; set; }
         public int ID { get; private set; }
@@ -24,12 +22,26 @@ namespace CybrEngine {
 
         public bool IsDestroyed {
             get {
-                return Destroyed;
+                return BeingDestroyed || Destroyed;
             }
         }
 
-        public void SetActive(){ Active = true; }
-        public virtual void Destroy() { Destroyed = true; }
+        public void Start() {
+            if(IsCreated) return;
+            IsCreated = true;
+        }
+
+        public virtual void SendMessage(string name) {
+            messager.SendMessage(this, name);
+        }
+
+        public void SetActive(bool value = true) { Active = value; }
+        public void Destroy() { BeingDestroyed = true; _Cleanup(); Destroyed = true; }
+
+        /// <summary>
+        /// Function that handles cleaning up un-managed data
+        /// </summary>
+        protected virtual void _Cleanup() { }
 
         public override bool Equals(object obj) {
             return obj is Object @object &&
@@ -40,17 +52,11 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        protected Object Instantiate<T>() where T : Entity {
-            return eHandler.Instantiate<T>();
-        }
-
-        protected T Instantiate<T>(Vector2 position) where T : Entity {
-            return eHandler.Instantiate<T>(position);
-        }
-
-        protected Object(){
-            eHandler = Handlers.GetHandler<EntityHandler>();
+        protected Object() {
             ID = GLOBAL_ID++;
+            Active = true;
+
+            messager = Messager.Instance;
         }
 
         public static bool operator ==(Object left, Object right) {

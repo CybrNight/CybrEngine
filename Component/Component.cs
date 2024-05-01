@@ -1,35 +1,28 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 /// <summary
 /// Defines generic Component base class
 /// </summary>
 namespace CybrEngine {
-    public abstract class Component : IComponent {
+    public abstract class Component : Object {
 
         protected readonly Type _cgroup;
 
         public virtual void Update() { }
+        public virtual void Draw(SpriteBatch spriteBatch) { }
 
-        public string Name { get; set; }
-        public Entity Entity { get; set; }
         public bool Unique { get; set; }
-        public virtual Type ComponentType { get { return typeof(IComponent);} }
-
-        public virtual void Init(Entity entity) { Entity = entity; }
-        public virtual void Destroy(){ Entity = null; }
+        public virtual Type ComponentType { get { return typeof(Component); } }
 
         public override bool Equals(object obj) {
             return obj is Component component &&
-                   Name == component.Name &&
-                   EqualityComparer<Entity>.Default.Equals(Entity, component.Entity);
+                   Name == component.Name;
         }
 
         public override int GetHashCode() {
-            return HashCode.Combine(Name, Entity);
+            return HashCode.Combine(Name);
         }
 
         // Overload bool to allow null checks
