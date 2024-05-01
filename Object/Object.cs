@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CybrEngine {
     public abstract class Object {
@@ -35,8 +30,8 @@ namespace CybrEngine {
             if(IsCreated) return;
             IsCreated = true;
         }
-        
-        public virtual void SendMessage(string name){
+
+        public virtual void SendMessage(string name) {
             messager.SendMessage(this, name);
         }
 

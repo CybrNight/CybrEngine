@@ -1,12 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CybrEngine {
     internal class ComponentStore {
@@ -18,15 +10,15 @@ namespace CybrEngine {
             cMap = new Dictionary<int, List<Component>>();
         }
 
-        public void Remove(int id){
-            if (cMap.ContainsKey(id)){
-                for (int i = 0; i < cMap[id].Count; i++){
+        public void Remove(int id) {
+            if(cMap.ContainsKey(id)) {
+                for(int i = 0; i < cMap[id].Count; i++) {
                     cMap[id][i].Destroy();
                 }
                 cMap.Remove(id);
             }
         }
-       
+
         /// <summary>
         /// Creates Component ot type T and binds to Entity at index CINDEX
         /// </summary>
@@ -61,8 +53,8 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public List<T> GetComponents<T>(int id) where T :Component {
-            if (!cMap.ContainsKey(id)) {
+        public List<T> GetComponents<T>(int id) where T : Component {
+            if(!cMap.ContainsKey(id)) {
                 return null;
             }
 
@@ -71,7 +63,7 @@ namespace CybrEngine {
 
             for(int i = 0; i < cList.Count; i++) {
                 var component = cList[i];
-                if (component is T){
+                if(component is T) {
                     result.Add((T)component);
                 }
             }

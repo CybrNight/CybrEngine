@@ -1,19 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 
-namespace CybrEngine
-{
+namespace CybrEngine {
     /// <summary>
     /// Class defining custom Game type
     /// Allows for different Game to be swapped out
     /// </summary>
-    public abstract class CybrGame : Game
-    {
+    public abstract class CybrGame : Game {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
@@ -34,9 +28,9 @@ namespace CybrEngine
 
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
-        private bool GameRunning {  get; set; }
+        private bool GameRunning { get; set; }
 
-        public CybrGame() : base(){ 
+        public CybrGame() : base() {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
@@ -55,8 +49,7 @@ namespace CybrEngine
             return ObjectHandler.Instance.Instantiate<T>();
         }
 
-        protected sealed override void Initialize()
-        {
+        protected sealed override void Initialize() {
             // TODO: Add your initialization logic here
             fixedUpdateRate = (int)(Config.FIXED_UPDATE_FPS == 0 ? 0 : (1000 / (float)Config.FIXED_UPDATE_FPS));
             Time.fixedUpdateRate = TimeSpan.FromTicks((long)TimeSpan.TicksPerSecond / Config.FIXED_UPDATE_FPS);
@@ -70,19 +63,18 @@ namespace CybrEngine
             base.Initialize();
         }
 
-        protected override void LoadContent()
-        {
+        protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            
+
             //After core content loaded, tell game to load unique assets
-            if(LoadGameContent()){
+            if(LoadGameContent()) {
 
                 if(GameInit()) { //If content loaded, tell game to init
                     GameRunning = GameStart();
                 }
-            } 
-            
-            if (!GameRunning){
+            }
+
+            if(!GameRunning) {
                 Exit();
             }
         }
@@ -92,10 +84,9 @@ namespace CybrEngine
         private float fixedUpdateDelta = 0.33f;
         private float previousT = 0;
         private float accumulator = 0.0f;
-        private float maxFrameTime = 250; 
+        private float maxFrameTime = 250;
 
-        protected override void Update(GameTime gameTime)
-        {
+        protected override void Update(GameTime gameTime) {
 
             if(gameTime.ElapsedGameTime.TotalSeconds > 0.1) {
                 accumulator = 0;
@@ -124,7 +115,7 @@ namespace CybrEngine
                 inputHandler.Update();
                 GameUpdate();
 
-                while (accumulator >= fixedUpdateDelta){
+                while(accumulator >= fixedUpdateDelta) {
                     objHandler.FixedUpdate();
                     Time.FixedUpdate(ref gameTime);
                     fixedUpdateElapsedTime += fixedUpdateDelta;
@@ -137,11 +128,11 @@ namespace CybrEngine
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime){
-            
+        protected override void Draw(GameTime gameTime) {
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            if (GameRunning){
+            if(GameRunning) {
                 objHandler.Draw(spriteBatch);
                 GameDraw();
             }

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace CybrEngine {
     public abstract class Entity : Object {
@@ -18,19 +15,19 @@ namespace CybrEngine {
         /// <summary>
         /// Get Position of Entity Transform
         /// </summary>
-        public Vector2 Position { 
-            get { return Transform.Position; } 
-            set { Transform.Position = value; } 
+        public Vector2 Position {
+            get { return Transform.Position; }
+            set { Transform.Position = value; }
         }
 
         /// <summary>
         /// Get Bounds of Entity Transform
         /// </summary>
-        public Rectangle Bounds { 
+        public Rectangle Bounds {
             get { return Transform.Bounds; }
         }
 
-        public Vector2 Velocity{
+        public Vector2 Velocity {
             get { return Transform.Velocity; }
             set { Transform.Velocity = value; }
         }
@@ -97,7 +94,7 @@ namespace CybrEngine {
             return objHandler.Instantiate<T>(new Vector2(x, y));
         }
 
-        public static implicit operator bool(Entity e){
+        public static implicit operator bool(Entity e) {
             return (e != null);
         }
 

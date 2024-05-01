@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -14,16 +13,16 @@ namespace CybrEngine {
             sprites.Add(name, sprite);
         }
 
-        public static void DisposeTexture(string name) { 
+        public static void DisposeTexture(string name) {
             var sprite = sprites[name];
-            if (sprite != null) {
+            if(sprite != null) {
                 sprites.Remove(name);
                 sprite.Dispose();
             }
         }
 
-        public static Texture2D GetTexture(string name){
-            if (sprites.ContainsKey(name)) return sprites[name];
+        public static Texture2D GetTexture(string name) {
+            if(sprites.ContainsKey(name)) return sprites[name];
             else {
                 throw new NullReferenceException(name + " does not exist in the Asset store");
             }

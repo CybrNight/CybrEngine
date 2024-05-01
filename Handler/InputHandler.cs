@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace CybrEngine {
 
@@ -37,7 +34,8 @@ namespace CybrEngine {
                     _instance = new InputHandler();
                 }
                 return _instance;
-            }}
+            }
+        }
 
         /// <summary>
         /// Stores all input axes used by InputHandler

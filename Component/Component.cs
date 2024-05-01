@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 /// <summary
 /// Defines generic Component base class
@@ -14,10 +11,10 @@ namespace CybrEngine {
         protected readonly Type _cgroup;
 
         public virtual void Update() { }
-        public virtual void Draw(SpriteBatch spriteBatch){ }
+        public virtual void Draw(SpriteBatch spriteBatch) { }
 
         public bool Unique { get; set; }
-        public virtual Type ComponentType { get { return typeof(Component);} }
+        public virtual Type ComponentType { get { return typeof(Component); } }
 
         public override bool Equals(object obj) {
             return obj is Component component &&
