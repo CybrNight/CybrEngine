@@ -82,7 +82,7 @@ namespace CybrEngine {
             return HashCode.Combine(base.GetHashCode(), Name, ID);
         }
 
-        protected Entity Instantiate<T>() where T : Entity {
+        protected T Instantiate<T>() where T : Entity {
             return objHandler.Instantiate<T>();
         }
 

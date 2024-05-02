@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace CybrEngine {
     public static class Time {
@@ -15,10 +16,17 @@ namespace CybrEngine {
         public static float frameTime;
         public static TimeSpan fixedUpdateRate;
 
+        public static List<Alarm> alarms = new List<Alarm>();
+
         public static void Update(ref GameTime gameTime) {
             deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            for (int i = 0; i < alarms.Count; i++){
+                Alarm alarm = alarms[i];
+                alarm.SendMessage("Tick");
+            }
         }
 
         public static void FixedUpdate(ref GameTime gameTime) {

@@ -6,15 +6,15 @@ namespace CybrEngine {
     public class Sprite : Component, IDrawComponent {
 
         public Sprite() {
-            Name = "SpriteRenderer";
-
+            Name = "Sprite";
         }
 
         public Transform Transform { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
 
-        public Vector2 Offset { get; set; }
+        public Vector2 Offset { get; set; } = Vector2.Zero; 
         public Texture2D Texture { get; private set; }
+        public Color Color { get; set; } = Color.White;
 
         public Rectangle Bounds {
             get { return Texture.Bounds; }
@@ -27,21 +27,6 @@ namespace CybrEngine {
         protected override void _Cleanup() {
             Texture = null;
             Transform = null;
-        }
-
-        public override void Draw(SpriteBatch spriteBatch) {
-            if(Texture == null) return;
-
-
-            spriteBatch.Draw(Texture, Transform.Position, null, Color.White, 0f,
-            Transform.Origin,
-            Transform.Scale,
-            SpriteEffects.None,
-            0f);
-        }
-
-        public override Type ComponentType {
-            get { return typeof(IDrawComponent); }
         }
     };
 }

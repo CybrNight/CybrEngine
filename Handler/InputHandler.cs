@@ -93,7 +93,7 @@ namespace CybrEngine {
         }
 
         public int GetAxisRaw(string axis) {
-            return axes[axis].CeilToInt();
+            return Mathf.CeilToInt(axes[axis]);
         }
 
         public float GetAxis(string axis) {

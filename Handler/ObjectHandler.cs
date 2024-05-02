@@ -32,13 +32,24 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
-            var cList = objPool.FindAll(e => e is Entity);
-            for(int i = 0; i < cList.Count; i++) {
-                var entity = cList[i] as Entity;
-                entity.Sprite.Draw(spriteBatch);
+            var entities = objPool.FindAll(e => e is Entity);
+            for(int i = 0; i < entities.Count; i++) {
+                var entity = (entities[i] as Entity);
+                var sprite = entity.Sprite;
+                if(sprite == null || sprite.Texture == null) continue;
+
+                var transform = entity.Transform;
+                spriteBatch.Draw(sprite.Texture, transform.Position, null, sprite.Color, 0f,
+                transform.Origin,
+                transform.Scale,
+                SpriteEffects.None,
+                0f);
             }
         }
 
+        /// <summary>
+        /// Called every frame tick by CybrGame
+        /// </summary>
         public void Update() {
             //Instantiate all Entites queued from last update
             InstantiateQueuedObjects();
@@ -55,6 +66,7 @@ namespace CybrEngine {
                     int index = e.ID;
                     objPool.Remove(e);
                     store.Remove(index);
+                    continue;
                 } else if(e.IsActive) {
                     e.SendMessage("_Update");
                 }
