@@ -1,20 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CybrEngine {
 
     public static class Mathf {
-        
+
         /// <summary>
         /// Returns Cos of angle in degrees
         /// </summary>
         /// <param name="degrees"></param>
         /// <returns></returns>
-        public static float Cos(float degrees){
+        public static float Cos(float degrees) {
             return (float)Math.Cos(degrees.Radians());
         }
 
@@ -32,7 +28,7 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static int Sign(float value){
+        public static int Sign(float value) {
             return Math.Sign(value);
         }
 
@@ -41,7 +37,7 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static int FloorToInt(float value){
+        public static int FloorToInt(float value) {
             return (int)Math.Floor(value);
         }
 
@@ -50,7 +46,7 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static int CeilToInt(float value){
+        public static int CeilToInt(float value) {
             return (int)Math.Ceiling(value);
         }
 
@@ -79,6 +75,20 @@ namespace CybrEngine {
         /// <returns></returns>
         public static float Degrees(this float radians) {
             return MathHelper.ToDegrees(radians);
+
+        }
+
+        /// <summary>
+        /// Converts int value to clamp degree value
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        public static float Angle(this int angle){
+            return (angle % 360);
+        }
+
+        public static Vector2 ToVector2(this Point point) {
+            return new Vector2(point.X, point.Y);
         }
     }
 }

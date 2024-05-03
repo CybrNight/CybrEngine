@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CybrEngine {
 
@@ -16,6 +17,10 @@ namespace CybrEngine {
 
         public static bool GetKey(Keys key) {
             return _inputHandler.GetKey(key);
+        }
+
+        public static bool GetKeyDown(Keys key){
+            return _inputHandler.GetKeyDown(key);
         }
 
         public static int GetAxisRaw(string axis) {
@@ -64,6 +69,12 @@ namespace CybrEngine {
         public void Update() {
             var kstate = Keyboard.GetState();
 
+            foreach(Keys key in pressedKeys.Keys) {
+                if (!kstate.IsKeyDown(key)){
+                    ResetKey(key);
+                }
+            }
+
             //Update Horizontal, and Vertical axes with directional int value
             axes["Horizontal"] = (-GetKeyVal(Keys.Left) + GetKeyVal(Keys.Right));
             axes["Vertical"] = (GetKeyVal(Keys.Up) - GetKeyVal(Keys.Down));
@@ -75,21 +86,8 @@ namespace CybrEngine {
                     ResetKey(key);
                 }
 
-                //Incrament pressed frames count;
-                if(pressedKeys[key] < 1) {
-                    pressedKeys[key] += Time.deltaTime;
-                }
+                pressedKeys[key]++;
             }
-
-            //Check if any Keys released this frame
-            foreach(Keys key in pressedKeys.Keys) {
-                //If key released reset value in pressedKeys
-                if(kstate.IsKeyUp(key)) {
-                    ResetKey(key);
-                }
-            }
-
-
         }
 
         public int GetAxisRaw(string axis) {
@@ -107,7 +105,7 @@ namespace CybrEngine {
                 return false;
             }
 
-            return (kstate.IsKeyDown(key));
+            return pressedKeys[key] > 0;
         }
 
         //Gets current state of a Key as Int
@@ -118,13 +116,10 @@ namespace CybrEngine {
         //Check if Key pressed this frame
         public bool GetKeyDown(Keys key) {
             if(!pressedKeys.ContainsKey(key)) {
-                return false;
+                pressedKeys[key] = 0;
             }
-            return (pressedKeys[key] > 1);
-        }
-
-        void IMessageable.SendMessage(string name, object[] args) {
-            Messager.Instance.SendMessage(this, name, args);
+            Debug.WriteLine("Press:"+pressedKeys[key]);
+            return (pressedKeys[key] >= 1 && pressedKeys[key] <= 2);
         }
     }
 }

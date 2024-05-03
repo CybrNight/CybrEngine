@@ -2,9 +2,34 @@
 using System;
 
 namespace CybrEngine {
+
+    public struct WindowRect {
+        public Rectangle Rect { get; set; }
+
+        public int X => Rect.X;
+        public int Y => Rect.Y;
+        public int Width => Rect.Width;
+        public int Height => Rect.Height;
+
+        public Point Center => Rect.Center;
+
+        //Define Window corners
+        public Point TL => new Point(Rect.X, Rect.Y);
+        public Point TR => new Point(Rect.Right, Rect.Bottom);
+        public Point BL => new Point(Rect.Left, Rect.Bottom);
+        public Point BR => new Point(Rect.Right, Rect.Bottom);
+
+        public WindowRect(int w, int h) {
+            Rect = new Rectangle(0, 0, w, h);
+        }
+    }
+
     public class Config {
-        public static int RES_X { get; set; } = 640;
-        public static int RES_Y { get; set; } = 480;
+
+        public static WindowRect WINDOW { get; set; } = new WindowRect(640, 480);
+
+        public static int WINDOW_WIDTH { get { return WINDOW.Width; } }
+        public static int WINDOW_HEIGHT { get { return WINDOW.Height; } }
 
         public static Color BACKGROUND_COLOR { get; set; } = Color.Black;
 
@@ -25,7 +50,7 @@ namespace CybrEngine {
         public static float SPRITE_DRAW_OFFSET { get; set; } = 0f;
         public static float SPRITE_COLLISION_OFFSET { get; set; } = 0f;
 
-        public static float TIME_OFFSE{ get; set; } = 0.1f;
+        public static float TIME_OFFSE { get; set; } = 0.1f;
         public static int FIXED_UPDATE_FPS { get; set; } = 60;
         public static int PIVOT_RADIUS { get; set; } = 10;
 

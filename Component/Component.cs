@@ -7,14 +7,20 @@ using System.Collections.Generic;
 /// </summary>
 namespace CybrEngine {
     public abstract class Component : Object {
+        public static T Create<T>(GameObject entity) where T : Component{
+            var component = Builder.Component<T>();
+            component.Entity = entity;
+            return component;
+        }
 
-        protected readonly Type _cgroup;
+        private void _Cleanup() {
+            Entity = null;
+        }
 
-        public virtual void Update() { }
         public virtual void Draw(SpriteBatch spriteBatch) { }
 
-        public bool Unique { get; set; }
-        public virtual Type ComponentType { get { return typeof(Component); } }
+        public GameObject Entity { get; private set; }
+        public bool Unique { get; set; } = false;
 
         public override bool Equals(object obj) {
             return obj is Component component &&

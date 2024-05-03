@@ -14,7 +14,11 @@ namespace CybrEngine {
 
         }
 
-        ~Transform() {
+        public void Translate(Vector2 translation) {
+            Position += translation;
+        }
+
+        public Transform(): this(0, 0){
 
         }
 

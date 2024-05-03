@@ -16,15 +16,15 @@ namespace CybrEngine {
         public static float frameTime;
         public static TimeSpan fixedUpdateRate;
 
-        public static List<Alarm> alarms = new List<Alarm>();
+        public static List<Timer> alarms = new List<Timer>();
 
         public static void Update(ref GameTime gameTime) {
             deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            for (int i = 0; i < alarms.Count; i++){
-                Alarm alarm = alarms[i];
+            for(int i = 0; i < alarms.Count; i++) {
+                Timer alarm = alarms[i];
                 alarm.SendMessage("Tick");
             }
         }

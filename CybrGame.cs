@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace CybrEngine {
     /// <summary>
@@ -14,7 +14,6 @@ namespace CybrEngine {
         private TickHandler handler;
         private ObjectHandler objHandler;
         private InputHandler inputHandler;
-        private Messager messager;
 
         protected abstract bool LoadGameContent();
         protected abstract bool GameInit();
@@ -26,31 +25,35 @@ namespace CybrEngine {
 
         private bool GameRunning { get; set; }
 
-        public CybrGame() : base() {
+        public CybrGame() {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
             Assets.Content = Content;
+            Assets.GraphicsDevice = GraphicsDevice;
 
 
             //Initialize singleton handlers
-           
+
 
             IsMouseVisible = true;
         }
 
-        public Object Instantiate<T>() where T : Entity {
-            return ObjectHandler.Instance.Instantiate<T>();
+        public GameObject Instantiate(GameObject instance){
+            return objHandler.AddInstance(instance);
+        }
+
+        public T Instantiate<T>() where T : GameObject {
+            return objHandler.Instantiate<T>(new Vector2());
         }
 
         protected sealed override void Initialize() {
             graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = Config.RES_X;
-            graphics.PreferredBackBufferHeight = Config.RES_Y;
+            graphics.PreferredBackBufferWidth = Config.WINDOW_WIDTH;
+            graphics.PreferredBackBufferHeight = Config.WINDOW_HEIGHT;
             graphics.ApplyChanges();
 
             handler = TickHandler.Instance;
-            messager = Messager.Instance;
             inputHandler = InputHandler.Instance;
             objHandler = ObjectHandler.Instance;
 
@@ -58,31 +61,29 @@ namespace CybrEngine {
         }
 
         protected override void LoadContent() {
+            Assets.AddTexture("missing_tex", new Texture2D(GraphicsDevice, 32, 32));
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()) {
-
-                if(GameInit()) { //If content loaded, tell game to init
+                if (GameInit()){
                     GameRunning = GameStart();
                 }
             }
 
-            if(!GameRunning) {
-                Exit();
-            }
+
+            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime) {
             if(GameRunning) {
-                handler.Update(gameTime);                
+                handler.Update(gameTime);
             }
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime) {
             spriteBatch.Begin();
-            if (GameRunning){
+            if(GameRunning) {
                 GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
                 handler.Draw(spriteBatch);
                 GameDraw();

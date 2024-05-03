@@ -1,30 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CybrEngine {
-   internal class TickHandler {
+    internal class TickHandler {
 
         private ObjectHandler _objHandler;
         private InputHandler _inputHandler;
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
         private static TickHandler _instance;
-        public static TickHandler Instance{
+        public static TickHandler Instance {
             get {
-                if (_instance == null){
-                _instance = new TickHandler(ObjectHandler.Instance, InputHandler.Instance);
+                if(_instance == null) {
+                    _instance = new TickHandler(ObjectHandler.Instance, InputHandler.Instance);
                 }
                 return _instance;
             }
         }
 
-        private TickHandler(ObjectHandler objHandler, InputHandler inputHandler){
+        private TickHandler(ObjectHandler objHandler, InputHandler inputHandler) {
             _objHandler = objHandler;
             _inputHandler = inputHandler;
 
@@ -40,7 +35,7 @@ namespace CybrEngine {
         private float previousT = 0;
         private float accumulator = 0.0f;
         private float maxFrameTime = 250;
-        public void Update(GameTime gameTime){
+        public void Update(GameTime gameTime) {
             if(gameTime.ElapsedGameTime.TotalSeconds > 0.1) {
                 accumulator = 0;
                 previousT = 0;
@@ -75,12 +70,12 @@ namespace CybrEngine {
             Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
         }
 
-        public void Draw(SpriteBatch spriteBatch){
+        public void Draw(SpriteBatch spriteBatch) {
             _objHandler.Draw(spriteBatch);
             // TODO: Add your drawing code here
         }
 
-        private void FixedUpdate(){ 
+        private void FixedUpdate() {
             _objHandler.FixedUpdate();
         }
     }
