@@ -30,6 +30,7 @@ namespace CybrEngine {
 
             internal static T Instantiate(ObjectHandler objHandler) {
                 var gameObject = Builder.GameObject<T>();
+                gameObject.Name = gameObject.GetType().Name;
                 gameObject.objHandler = objHandler;
                 return gameObject;
             }

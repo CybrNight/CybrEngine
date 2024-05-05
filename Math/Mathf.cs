@@ -2,11 +2,28 @@
 using System;
 
 namespace CybrEngine {
-
+    /// <summary>
+    /// Wrapper for System.Math, use floats instead of doubles
+    /// </summary>
     public static class Mathf {
 
         /// <summary>
-        /// Returns Cos of angle in degrees
+        /// Clamps value to range
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static float Clamp(float value, float min, float max) {
+            return Math.Clamp(value, min, max);
+        }
+
+        public static int Clamp(int value, int min, int max){
+            return Clamp(value, min, max);
+        }
+
+        /// <summary>
+        /// Returns cos(anglee) in degrees
         /// </summary>
         /// <param name="degrees"></param>
         /// <returns></returns>
@@ -15,7 +32,7 @@ namespace CybrEngine {
         }
 
         /// <summary>
-        /// Returns Sin of angle in degrees
+        /// Returns sin(angle) in degrees
         /// </summary>
         /// <param name="degrees"></param>
         /// <returns></returns>
@@ -24,7 +41,7 @@ namespace CybrEngine {
         }
 
         /// <summary>
-        /// Returns Sign of value in degrees
+        /// Returns sign(value)
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -33,7 +50,7 @@ namespace CybrEngine {
         }
 
         /// <summary>
-        /// Returns Floor of float value
+        /// Returns returns Math.Floor as an int
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -42,12 +59,30 @@ namespace CybrEngine {
         }
 
         /// <summary>
-        /// Returns Ceil of float value
+        /// Returns Math.Ceiling as an int
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static int CeilToInt(float value) {
             return (int)Math.Ceiling(value);
+        }
+    }
+
+    public static class MathExtensions{
+        public static float Clamp(this float value, float min, float max){
+            return Math.Clamp(value, min, max);
+        }
+
+        public static int Clamp(this int value, int min, int max) {
+            return Mathf.Clamp(value, min, max);
+        }
+
+        public static int Floor(this float value) {
+            return Mathf.FloorToInt(value);
+        }
+
+        public static int Ceil(this float value) {
+            return Mathf.CeilToInt(value);
         }
 
         /// <summary>
@@ -81,10 +116,14 @@ namespace CybrEngine {
         /// <summary>
         /// Converts int value to clamp degree value
         /// </summary>
-        /// <param name="angle"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        public static float Angle(this int angle){
-            return (angle % 360);
+        public static float ClampAngle(this float value) {
+            return (value % 360);
+        }
+
+        public static int ClampAngle(this int value) {
+            return (value % 360);
         }
 
         public static Vector2 ToVector2(this Point point) {

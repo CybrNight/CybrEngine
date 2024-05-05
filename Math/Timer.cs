@@ -9,7 +9,7 @@ namespace CybrEngine {
         public bool Loop { get; set; }
         public bool Fixed { get; set; }
 
-        public event Action Callback;
+        public event Action OnTimeout;
 
         public Timer(float max, bool loop = false, bool fix = false ) {
             Max = max;
@@ -17,18 +17,23 @@ namespace CybrEngine {
             Time.alarms.Add(this);
         }
 
-        public void Reset() {
-            Callback.Invoke();
+        private void Timeout() {
+            OnTimeout?.Invoke();
             Counter = 0;
+
+            if(!Loop) {
+                IsActive = false;
+            }
         }
 
         public void Start() {
+            Counter = 0;
             IsActive = true;
         }
 
         private void Tick() {
             if(Counter >= Max) {
-                Reset();
+                Timeout();    
             }
 
             Counter += Time.deltaTime;

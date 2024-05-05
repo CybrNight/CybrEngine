@@ -17,6 +17,8 @@ namespace CybrEngine {
             Entity = null;
         }
 
+        public virtual void Update(){ }
+
         public virtual void Draw(SpriteBatch spriteBatch) { }
 
         public GameObject Entity { get; private set; }

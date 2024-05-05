@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace CybrEngine {
     /// <summary>
@@ -23,7 +24,8 @@ namespace CybrEngine {
         protected abstract void GameDraw();
         protected abstract void GameStop();
 
-        private bool GameRunning { get; set; }
+        private bool GameRunning { get; set; } = false;
+        private bool ContentLoaded { get; set; } = false;
 
         public CybrGame() {
             graphics = new GraphicsDeviceManager(this);
@@ -66,19 +68,34 @@ namespace CybrEngine {
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()) {
                 if (GameInit()){
-                    GameRunning = GameStart();
+                    ContentLoaded = GameStart();
+                    base.LoadContent();
                 }
             }
 
 
-            base.LoadContent();
+           
         }
 
         protected override void Update(GameTime gameTime) {
             if(GameRunning) {
                 handler.Update(gameTime);
+            }else if (ContentLoaded){
+                GameRunning = true;
             }
             base.Update(gameTime);
+        }
+
+        protected override void BeginRun() {
+            base.BeginRun();
+        }
+
+        protected override void EndDraw() {
+            base.EndDraw();
+        }
+
+        protected override bool BeginDraw() {
+            return base.BeginDraw();
         }
 
         protected override void Draw(GameTime gameTime) {
@@ -88,8 +105,8 @@ namespace CybrEngine {
                 handler.Draw(spriteBatch);
                 GameDraw();
             }
-            spriteBatch.End();
             base.Draw(gameTime);
+            spriteBatch.End();
         }
     }
 }

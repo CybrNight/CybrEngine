@@ -24,7 +24,7 @@ namespace CybrEngine {
         public void Update(){
             foreach(var cList in cMap.Values){
                 foreach(var c in cList) {
-                    c.SendMessage("_Update");
+                    c.Update();
                 }
             }   
         }

@@ -25,7 +25,9 @@ namespace CybrEngine {
 
             for(int i = 0; i < alarms.Count; i++) {
                 Timer alarm = alarms[i];
-                alarm.SendMessage("Tick");
+                if (alarm.IsActive){
+                    alarm.SendMessage("Tick");
+                }
             }
         }
 

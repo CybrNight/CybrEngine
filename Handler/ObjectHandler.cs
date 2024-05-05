@@ -43,9 +43,6 @@ namespace CybrEngine {
         /// </summary>
         public void Update() {
             //Instantiate all Entites queued from last update
-            Debug.WriteLine(objPool.Count);
-
-
             AddInstantiatedObjects();
 
             compAlloc.Update();
@@ -55,7 +52,7 @@ namespace CybrEngine {
                     //Remove Entity, and Destory ComponentList
                     obj.SendMessage("_Cleanup");
                     objPool.Remove(obj);
-                    compAlloc.RemoveComponents(obj as GameObject);
+                    compAlloc.RemoveComponents(obj);
                     continue;
                 }
 
@@ -70,7 +67,7 @@ namespace CybrEngine {
         public void FixedUpdate() {
             var ents = objPool.FindAll(e => e is GameObject);
             for(int i = 0; i < ents.Count; i++) {
-                var e1 = ents[i] as GameObject;
+                var e1 = ents[i];
 
                 //If Entity IsActive, then run _FixedUpdate
                 if(e1.IsActive) {
@@ -82,7 +79,7 @@ namespace CybrEngine {
 
                     //Check all Entity for collision
                     for(int j = 0; j < ents.Count; j++) {
-                        var e2 = ents[j] as GameObject;
+                        var e2 = ents[j];
                         if(e1 != e2 && e2.IsActive) {
                             if(e1.Intersects(e2)) {
                                 e1.OnIntersection(e2);
