@@ -22,6 +22,10 @@ namespace CybrEngine {
             return Clamp(value, min, max);
         }
 
+        public static float Abs(float value){
+            return Math.Abs(value);
+        }
+
         /// <summary>
         /// Returns cos(anglee) in degrees
         /// </summary>

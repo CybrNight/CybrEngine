@@ -20,6 +20,17 @@ namespace CybrEngine {
             Texture = texture;
         }
 
+        public override void Draw(SpriteBatch spriteBatch){
+            if(Texture == null) return;
+
+            var transform = Entity.Transform;
+            spriteBatch.Draw(Texture, transform.Position, null, Color, 0f,
+            transform.Origin,
+            transform.Scale,
+            SpriteEffects.None,
+            0f);
+        }
+
         private void _Cleanup() {
             Texture = null;
         }

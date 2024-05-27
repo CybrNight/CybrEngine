@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -6,6 +7,10 @@ namespace CybrEngine {
     public static class MesssageExtensions {
         public static void SendMessage(this IMessageable obj, string message) {
             Messager.SendMessage(obj, message);
+        }
+
+        public static void SendMessage(this IMessageable obj, string message, params object[] args) {
+            Messager.SendMessage(obj, message, args);
         }
     }
 
@@ -17,13 +22,17 @@ namespace CybrEngine {
             msgCache = new Dictionary<object, Dictionary<string, MethodInfo>>();
         }
 
+        public static void SendMessage(object instance, string name){
+            SendMessage(instance, name, null);
+        }
+
         /// <summary>
         /// Invokes private method with name on instance
         /// </summary>
         /// <param name="instance"></param>
         /// <param name="name"></param>
-        /// <param name="args"></param>
-        public static void SendMessage(object instance, string name, object[] args = null) {
+        /// <param name="paramVals"></param>
+        public static void SendMessage(object instance, string name, object[] paramVals) {
             //If first time messaging this instance, add new cache for it, and return
             if(!msgCache.ContainsKey(instance)) {
                 msgCache[instance] = new Dictionary<string, MethodInfo>();
@@ -33,7 +42,7 @@ namespace CybrEngine {
                 if(cache.ContainsKey(name)) {
                     var method = cache[name];
                     try {
-                        method.Invoke(instance, args);
+                        method.Invoke(instance, paramVals);
                     } catch(TargetException){
                         Debug.WriteLine("Type mismatch between " + instance + " and " + method);
                         throw new MessageException();
@@ -42,7 +51,7 @@ namespace CybrEngine {
                     var method = Builder.MethodCall(instance, name);
                     if(method != null) {
                         msgCache[instance].Add(name, method);
-                        method.Invoke(instance, args);
+                        method.Invoke(instance, paramVals);
                     }
                 }
             }

@@ -45,6 +45,15 @@ namespace CybrEngine {
             return objHandler.AddInstance(instance);
         }
 
+        public T Instantiate<T>(float x, float y) where T : GameObject {
+            return objHandler.Instantiate<T>(new Vector2(x, y));
+        }
+
+        public T Instantiate<T>(Vector2 position) where T : GameObject {
+            return objHandler.Instantiate<T>(position);
+        }
+
+
         public T Instantiate<T>() where T : GameObject {
             return objHandler.Instantiate<T>(new Vector2());
         }
@@ -99,14 +108,14 @@ namespace CybrEngine {
         }
 
         protected override void Draw(GameTime gameTime) {
+            if(!GameRunning) return;
+
             spriteBatch.Begin();
-            if(GameRunning) {
-                GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
-                handler.Draw(spriteBatch);
-                GameDraw();
-            }
-            base.Draw(gameTime);
+            GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
+            handler.Draw(spriteBatch);
+            GameDraw();
             spriteBatch.End();
+            base.Draw(gameTime);
         }
     }
 }

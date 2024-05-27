@@ -32,17 +32,7 @@ namespace CybrEngine {
         public void Draw(SpriteBatch spriteBatch){
             foreach(var cList in cMap.Values) {
                 foreach(var c in cList) {
-                    if(c is Sprite) {
-                        var sprite = (Sprite)c;
-                        if(sprite == null || sprite.Texture == null) continue;
-
-                        var transform = sprite.Entity.Transform;
-                        spriteBatch.Draw(sprite.Texture, transform.Position, null, sprite.Color, 0f,
-                        transform.Origin,
-                        transform.Scale,
-                        SpriteEffects.None,
-                        0f);
-                    }
+                    c.Draw(spriteBatch);
                 }
             }
         }

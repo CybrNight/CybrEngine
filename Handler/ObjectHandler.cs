@@ -36,6 +36,13 @@ namespace CybrEngine {
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
             compAlloc.Draw(spriteBatch);
+
+            for (int i = 0; i < objPool.Count; i++) {
+                GameObject obj = objPool[i];
+                if (obj is Entity){
+                    obj.SendMessage("_Draw", new object[]{spriteBatch});
+                }
+            }
         }
 
         /// <summary>

@@ -14,12 +14,15 @@ namespace CybrEngine {
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 null, paramTypes, null);
 
-            return (T)ci.Invoke(paramValues);
+            if(ci != null) {
+                return (T)ci.Invoke(paramValues);
+            }
+            return default(T);
         }
 
-        public static MethodInfo MethodCall(object instace, string name) {
+        public static MethodInfo MethodCall(object instance, string name) {
             // Get the type of MyClass
-            Type type = instace.GetType();
+            Type type = instance.GetType();
 
             // Get the method information using reflection
             MethodInfo method = type.GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance);
