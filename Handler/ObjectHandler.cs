@@ -36,7 +36,7 @@ namespace CybrEngine {
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
             compAlloc.Draw(spriteBatch);
-
+            objPool.Sort((x, y) => x.sortingLayer.CompareTo(y.sortingLayer));
             for (int i = 0; i < objPool.Count; i++) {
                 GameObject obj = objPool[i];
                 if (obj is Entity){
@@ -78,7 +78,7 @@ namespace CybrEngine {
 
                 //If Entity IsActive, then run _FixedUpdate
                 if(e1.IsActive) {
-                    e1.SendMessage("_FixedUpdate()");
+                    e1.SendMessage("_FixedUpdate");
 
                     //Update Position based on Velocity
                     e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.deltaTime,
@@ -132,6 +132,14 @@ namespace CybrEngine {
                 return (T)newObject;
             }
             throw new Exception("No Object of type " + typeof(T));
+        }
+
+        public T GetObjectOfType<T>() where T : GameObject{
+            return (T)objPool.Find(e => e is T);
+        }
+
+        public List<GameObject> GetObjectsOfType<T>() where T : GameObject{
+            return objPool.FindAll(e => e is T);
         }
 
         public GameObject AddInstance(GameObject gameObject){

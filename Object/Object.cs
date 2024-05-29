@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace CybrEngine {
@@ -32,6 +33,10 @@ namespace CybrEngine {
 
         public override int GetHashCode() {
             return HashCode.Combine(ID);
+        }
+
+        public void Print(string value){
+            Debug.WriteLine(value);
         }
 
         public Object() {

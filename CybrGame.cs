@@ -15,13 +15,14 @@ namespace CybrEngine {
         private TickHandler handler;
         private ObjectHandler objHandler;
         private InputHandler inputHandler;
+        private ParticleHandler particleHandler;
 
         protected abstract bool LoadGameContent();
         protected abstract bool GameInit();
         protected abstract bool GameStart();
 
         protected abstract void GameUpdate();
-        protected abstract void GameDraw();
+        protected abstract void GameDraw(SpriteBatch spriteBatch);
         protected abstract void GameStop();
 
         private bool GameRunning { get; set; } = false;
@@ -29,6 +30,19 @@ namespace CybrEngine {
 
         public CybrGame() {
             graphics = new GraphicsDeviceManager(this);
+
+            Content.RootDirectory = "Content";
+
+            IsMouseVisible = true;
+            IsFixedTimeStep = false;
+
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
+            Window.IsBorderless = false;
+            graphics.IsFullScreen = true;
+            graphics.HardwareModeSwitch = true;
+            graphics.SynchronizeWithVerticalRetrace = true;
+            graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
             Assets.Content = Content;
@@ -67,6 +81,7 @@ namespace CybrEngine {
             handler = TickHandler.Instance;
             inputHandler = InputHandler.Instance;
             objHandler = ObjectHandler.Instance;
+            particleHandler = ParticleHandler.Instance;
 
             base.Initialize();
         }
@@ -87,6 +102,7 @@ namespace CybrEngine {
         }
 
         protected override void Update(GameTime gameTime) {
+            Time.gameTime = gameTime;
             if(GameRunning) {
                 handler.Update(gameTime);
             }else if (ContentLoaded){
@@ -112,8 +128,9 @@ namespace CybrEngine {
 
             spriteBatch.Begin();
             GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
+            particleHandler.Draw(spriteBatch);
             handler.Draw(spriteBatch);
-            GameDraw();
+            GameDraw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }

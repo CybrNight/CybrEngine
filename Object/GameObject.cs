@@ -39,6 +39,7 @@ namespace CybrEngine {
         internal ObjectHandler objHandler;
 
         public Transform Transform { get; private set; }
+        public int sortingLayer = 0;
         protected GameObject(){ Transform = new Transform(); }
 
         /// <summary>
@@ -99,12 +100,20 @@ namespace CybrEngine {
             return HashCode.Combine(base.GetHashCode(), Name, ID);
         }
 
+        public Particle EmitParticle(Particle particle, Vector2 position){
+            return ParticleHandler.Instance.Emit(particle, position);
+        }
+
         public T Instantiate<T>() where T : GameObject {
             return Instantiate<T>(Position);
         }
 
         public T Instantiate<T>(Vector2 position) where T : GameObject {
             return ObjectHandler.Instance.Instantiate<T>(position);
+        }
+
+        public T FindObjectOfType<T>() where T : GameObject{
+            return objHandler.GetObjectOfType<T>();
         }
 
         public static implicit operator bool(GameObject e) {

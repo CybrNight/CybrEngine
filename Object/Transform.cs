@@ -10,7 +10,7 @@ namespace CybrEngine {
         public Vector2 Velocity { get; set; }
         public Vector2 Scale { get; set; }
         public Rectangle Bounds {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, 32, 32); }
+            get { return new Rectangle((int)Position.X, (int)Position.Y, 32*(int)Scale.X, (int)Scale.Y*32); }
 
         }
 
