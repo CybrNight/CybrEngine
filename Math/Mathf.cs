@@ -26,6 +26,10 @@ namespace CybrEngine {
             return Math.Abs(value);
         }
 
+        public static float Sqrt(float value){
+            return (float)Math.Sqrt((double)value);
+        }
+
         /// <summary>
         /// Returns cos(anglee) in degrees
         /// </summary>
