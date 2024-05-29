@@ -9,6 +9,7 @@ namespace CybrEngine {
     public static class Assets {
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, GameObject> objects = new Dictionary<string, GameObject>();
+        private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
 
         public static ContentManager Content;
         public static GraphicsDevice GraphicsDevice;
@@ -28,6 +29,19 @@ namespace CybrEngine {
 
         public static void AddTexture(string name, Texture2D texture){
             textures[name] = texture;
+        }
+
+        public static SpriteFont LoadSpriteFont(string name, string path){
+            SpriteFont font = Content.Load<SpriteFont>(path);
+            fonts.Add(name, font);
+            return font;
+        }
+
+        public static SpriteFont GetSpriteFont(string name){
+            if (textures.ContainsKey(name)){
+                return fonts[name];
+            }
+            return null;
         }
 
         public static Texture2D LoadTexture(string name, string path) {
