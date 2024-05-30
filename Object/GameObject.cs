@@ -5,9 +5,6 @@ using System.Runtime.CompilerServices;
 
 namespace CybrEngine {
     public abstract partial class GameObject : Object{
-        private ObjectHandler objHandler;
-        private ParticleHandler particleHandler;
-
         public Transform Transform { get; private set; }
         public int sortingLayer = 0;
         protected GameObject(){ Transform = new Transform(); }
@@ -47,16 +44,16 @@ namespace CybrEngine {
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return objHandler.AddComponent<T>(this);
+            return objAlloc.AddComponent<T>(this);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return objHandler.GetComponent<T>(this);
+            return objAlloc.GetComponent<T>(this);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return objHandler.GetComponents<T>(this);
+            return objAlloc.GetComponents<T>(this);
         }
 
         public override bool Equals(object obj) {
@@ -85,11 +82,11 @@ namespace CybrEngine {
         }
 
         public T Instantiate<T>(Vector2 position) where T : GameObject {
-            return objHandler.Instantiate<T>(position);
+            return objAlloc.Instantiate<T>(position);
         }
 
         public T FindObjectOfType<T>() where T : GameObject{
-            return objHandler.GetObjectOfType<T>();
+            return objAlloc.GetObjectOfType<T>();
         }
 
         public static implicit operator bool(GameObject e) {

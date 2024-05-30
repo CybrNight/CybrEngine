@@ -13,7 +13,7 @@ namespace CybrEngine {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private ObjectHandler objHandler;
+        private ObjectAllocator objHandler;
         private TickHandler tickHandler;
         private ParticleHandler particleHandler;
 
@@ -48,7 +48,7 @@ namespace CybrEngine {
             Assets.Content = Content;
             Assets.GraphicsDevice = GraphicsDevice;
 
-            objHandler = Autoload.objHandler;
+            objHandler = Autoload.objAllocator;
             tickHandler = Autoload.tickHandler;
             particleHandler = Autoload.particleHandler;
 

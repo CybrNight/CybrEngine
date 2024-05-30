@@ -10,7 +10,7 @@ namespace CybrEngine {
         public abstract void LoadObjects();
 
         protected T Instantiate<T>(Vector2 position = new Vector2()) where T : GameObject{
-            return ObjectHandler.Instance.Instantiate<T>(position);
+            return ObjectAllocator.Instance.Instantiate<T>(position);
         }
     }
 }

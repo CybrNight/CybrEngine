@@ -4,8 +4,36 @@ using System.Diagnostics;
 using System.Numerics;
 
 namespace CybrEngine {
+    public abstract class Object : IMessageable {
+        internal static class Factory<T> where T : Object {
+            /// <summary>
+            /// Constructs new instance of Object
+            /// </summary>
+            /// <returns></returns>
+            public static T Construct(Type[] paramTypes, object[] paramVals) {
+                var obj = Builder.Construct<T>(paramTypes, paramVals);
 
-    public  abstract partial class Object : IMessageable {
+                obj.objAlloc = Autoload.objAllocator;
+                obj.particleHandler= Autoload.particleHandler;
+                obj.Name = obj.GetType().ToString();
+
+                return obj;
+            }
+
+            public static T Construct(){
+                return Construct(new Type[] { }, null);
+            }
+
+            /// <summary>
+            /// Creates clone of Object instance
+            /// </summary>
+            /// <returns></returns>
+            public static T Instance(Object obj) {
+                var clone = obj.MemberwiseClone() as T;
+                return clone;
+            }
+        }
+
         public string Name { get; set; }
 
         protected bool Active { get; set; }
@@ -20,6 +48,9 @@ namespace CybrEngine {
         public bool IsDestroyed => BeingDestroyed || Destroyed;
 
         public void SetActive(bool value = true) { Active = value; }
+
+        internal ObjectAllocator objAlloc;
+        protected ParticleHandler particleHandler;
 
         /// <summary>
         /// Marks Object for destruction
@@ -50,6 +81,10 @@ namespace CybrEngine {
         public Object() {
             ID = GLOBAL_ID++;
             Active = true;
+        }
+
+        public T Instantiate<T>() where T : Object {
+            return Builder.Construct<T>();
         }
 
         public static bool operator ==(Object left, Object right) {

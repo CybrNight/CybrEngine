@@ -7,12 +7,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 namespace CybrEngine {
-    internal class ObjectHandler : IMessageable {
-        private static ObjectHandler _instance;
-        public static ObjectHandler Instance {
+    internal class ObjectAllocator : IMessageable {
+        private static ObjectAllocator _instance;
+        public static ObjectAllocator Instance {
             get {
                 if(_instance == null) {
-                    _instance = new ObjectHandler();
+                    _instance = new ObjectAllocator();
                 }
                 return _instance;
             }
@@ -24,7 +24,7 @@ namespace CybrEngine {
         private ComponentAllocator compAlloc;
 
 
-        private ObjectHandler() {
+        private ObjectAllocator() {
             objPool = new List<GameObject>();
             objQueue = new Queue<GameObject>();
             compAlloc = new ComponentAllocator();

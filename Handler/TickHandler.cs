@@ -5,7 +5,7 @@ using System;
 namespace CybrEngine {
     internal class TickHandler {
 
-        private ObjectHandler _objHandler;
+        private ObjectAllocator _objHandler;
         private InputHandler _inputHandler;
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
@@ -13,13 +13,13 @@ namespace CybrEngine {
         public static TickHandler Instance {
             get {
                 if(_instance == null) {
-                    _instance = new TickHandler(ObjectHandler.Instance, InputHandler.Instance);
+                    _instance = new TickHandler(ObjectAllocator.Instance, InputHandler.Instance);
                 }
                 return _instance;
             }
         }
 
-        private TickHandler(ObjectHandler objHandler, InputHandler inputHandler) {
+        private TickHandler(ObjectAllocator objHandler, InputHandler inputHandler) {
             _objHandler = objHandler;
             _inputHandler = inputHandler;
 

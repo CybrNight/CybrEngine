@@ -6,7 +6,7 @@ namespace CybrEngine {
     internal class ComponentAllocator {
 
         private Dictionary<GameObject, List<Component>> cMap;
-        private ObjectHandler _objHandler;
+        private ObjectAllocator _objHandler;
 
         /// <summary>
         /// Gets all Components from Entity

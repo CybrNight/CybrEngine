@@ -8,14 +8,14 @@ namespace CybrEngine {
     internal static class Autoload{
 
         public static TickHandler tickHandler;
-        public static ObjectHandler objHandler;
+        public static ObjectAllocator objAllocator;
         public static InputHandler inputHandler;
         public static ParticleHandler particleHandler;
         public static SceneManager sceneManager;
 
         static Autoload(){
             tickHandler = TickHandler.Instance;
-            objHandler = ObjectHandler.Instance;
+            objAllocator = ObjectAllocator.Instance;
             inputHandler = InputHandler.Instance;
             particleHandler = ParticleHandler.Instance; 
             sceneManager = SceneManager.Instance;
