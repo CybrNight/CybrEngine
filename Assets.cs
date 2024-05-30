@@ -17,7 +17,7 @@ namespace CybrEngine {
         public static Entity LoadObject(string path){
             //If object already loaded, return copy instance
             if (objects.ContainsKey(path)){
-                return GameObject.Factory<Entity>.Instance(objects[path]);
+                return Object.Factory<Entity>.Instance(objects[path]);
             }
 
             var entity = Content.Load<Entity>("object/" + path);
