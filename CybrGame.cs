@@ -1,5 +1,4 @@
-﻿using CybrEngine.Handler;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -14,11 +13,9 @@ namespace CybrEngine {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private TickHandler handler;
         private ObjectHandler objHandler;
-        private InputHandler inputHandler;
+        private TickHandler tickHandler;
         private ParticleHandler particleHandler;
-        private SceneManager sceneManager;
 
         protected abstract bool LoadGameContent();
         protected abstract bool GameInit();
@@ -51,6 +48,9 @@ namespace CybrEngine {
             Assets.Content = Content;
             Assets.GraphicsDevice = GraphicsDevice;
 
+            objHandler = Autoload.objHandler;
+            tickHandler = Autoload.tickHandler;
+            particleHandler = Autoload.particleHandler;
 
             //Initialize singleton handlers
 
@@ -81,18 +81,18 @@ namespace CybrEngine {
             graphics.PreferredBackBufferHeight = Config.WINDOW_HEIGHT;
             graphics.ApplyChanges();
 
-            handler = TickHandler.Instance;
-            inputHandler = InputHandler.Instance;
-            objHandler = ObjectHandler.Instance;
-            particleHandler = ParticleHandler.Instance;
-            sceneManager = SceneManager.Instance;
-
             base.Initialize();
         }
 
         protected override void LoadContent() {
-            Assets.AddTexture("missing_tex", new Texture2D(GraphicsDevice, 32, 32));
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            var _blankTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            _blankTexture.SetData(new[] { Color.White });
+
+            Assets.AddTexture("missing_tex", new Texture2D(GraphicsDevice, 32, 32));
+            Assets.AddTexture("blank", _blankTexture);
+
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()) {
                 if (GameInit()){
@@ -108,7 +108,7 @@ namespace CybrEngine {
         protected override void Update(GameTime gameTime) {
             Time.gameTime = gameTime;
             if(GameRunning) {
-                handler.Update(gameTime);
+                tickHandler.Update(gameTime);
             }else if (ContentLoaded){
                 GameRunning = true;
             }
@@ -130,10 +130,12 @@ namespace CybrEngine {
         protected override void Draw(GameTime gameTime) {
             if(!GameRunning) return;
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
+
             particleHandler.Draw(spriteBatch);
-            handler.Draw(spriteBatch);
+            objHandler.Draw(spriteBatch);
+
             GameDraw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
