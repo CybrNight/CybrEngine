@@ -7,7 +7,7 @@ namespace CybrEngine {
     /// Defines base class for Component
     /// </summary>
     public abstract class Component : Object {
-        public static T Create<T>(GameObject entity) where T : Component{
+        public static T Create<T>(Entity entity) where T : Component{
             var component = Builder.Component<T>();
             component.Entity = entity;
             return component;
@@ -22,7 +22,7 @@ namespace CybrEngine {
         /// <summary>
         /// Owner of Component
         /// </summary>
-        public GameObject Entity { get; private set; }
+        public Entity Entity { get; private set; }
 
         /// <summary>
         /// Defines if Component should be the only one allowed on Entity

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public partial class GameObject{
-        internal static class GameObjectFactory<T> where T : GameObject {
+    public partial class Entity{
+        internal static class GameObjectFactory<T> where T : Entity {
             internal static T Construct(ObjectAllocator objHandler) {
                 var gameObject = Builder.GameObject<T>();
 

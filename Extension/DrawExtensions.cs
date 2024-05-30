@@ -31,8 +31,16 @@ namespace CybrEngine{
         /// <param name="rect"></param>
         /// <param name="color"></param>
         /// <param name="layer"></param>
-        public static void DrawRect(this SpriteBatch s, Rectangle rect, Color color, float layer = 0.0f){
-            s.Draw(BlankTexture(s), rect, null, color, 0f, Vector2.Zero, SpriteEffects.None, layer);
+        public static void DrawRect(this SpriteBatch s, Rectangle rect, Color color, Vector2 origin, float layer = 0.0f){
+            s.Draw(BlankTexture(s), rect, rect, color, 0f, origin, SpriteEffects.None, layer);
+        }
+
+        public static void DrawRect(this SpriteBatch s, Rectangle rect, Color color, Vector2 origin, Vector2 scale, float layer = 0.0f) {
+            DrawRect(s, rect, color, Vector2.Zero, layer);
+        }
+
+        public static void DrawRect(this SpriteBatch s, Rectangle rect, Color color, float layer = 0.0f) {
+            DrawRect(s, rect, color, Vector2.Zero, layer);
         }
 
         public static Color Invert(this Color color){

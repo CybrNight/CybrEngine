@@ -6,6 +6,7 @@ namespace CybrEngine {
 
         private Sprite() {
             Name = "Sprite";
+            SetTexture(Assets.GetTexture("blank"));
         }
 
         public Vector2 Scale { get; set; } = Vector2.One;
@@ -29,7 +30,7 @@ namespace CybrEngine {
             var transform = Entity.Transform;
             spriteBatch.Draw(Texture, transform.Position, transform.Bounds, Color, 0f,
             transform.Origin,
-            transform.Scale,
+            Vector2.One,
             SpriteEffects.None,
             0f);
         }

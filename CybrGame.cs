@@ -58,20 +58,20 @@ namespace CybrEngine {
             IsMouseVisible = true;
         }
 
-        public GameObject Instantiate(GameObject instance){
+        public Entity Instantiate(Entity instance){
             return objHandler.AddInstance(instance);
         }
 
-        public T Instantiate<T>(float x, float y) where T : GameObject {
+        public T Instantiate<T>(float x, float y) where T : Entity {
             return objHandler.Instantiate<T>(new Vector2(x, y));
         }
 
-        public T Instantiate<T>(Vector2 position) where T : GameObject {
+        public T Instantiate<T>(Vector2 position) where T : Entity {
             return objHandler.Instantiate<T>(position);
         }
 
 
-        public T Instantiate<T>() where T : GameObject {
+        public T Instantiate<T>() where T : Entity {
             return objHandler.Instantiate<T>(new Vector2());
         }
 
@@ -130,7 +130,7 @@ namespace CybrEngine {
         protected override void Draw(GameTime gameTime) {
             if(!GameRunning) return;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
 
             particleHandler.Draw(spriteBatch);

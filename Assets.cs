@@ -8,7 +8,7 @@ using System.IO;
 namespace CybrEngine {
     public static class Assets {
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
-        private static Dictionary<string, GameObject> objects = new Dictionary<string, GameObject>();
+        private static Dictionary<string, Entity> objects = new Dictionary<string, Entity>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
 
         public static ContentManager Content;
