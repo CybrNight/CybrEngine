@@ -51,9 +51,6 @@ namespace CybrEngine {
         /// Called every frame tick by CybrGame
         /// </summary>
         public void Update() {
-            //Instantiate all Entites queued from last update
-            AddInstantiatedObjects();
-
             compAlloc.Update();
             for(int i = 0; i < objPool.Count; i++) {
                 var obj = objPool[i];
@@ -68,6 +65,9 @@ namespace CybrEngine {
                 obj.SendMessage("_Update");
                 compAlloc.Update();
             }
+
+            //Instantiate all Entites queued from last update
+            AddInstantiatedObjects();
         }
 
         /// <summary>

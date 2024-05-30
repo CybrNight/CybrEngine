@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     internal static class Autoload{
 
-        public static TickHandler tickHandler;
         public static ObjectAllocator objAllocator;
         public static InputHandler inputHandler;
         public static ParticleHandler particleHandler;
         public static SceneManager sceneManager;
 
         static Autoload(){
-            tickHandler = TickHandler.Instance;
             objAllocator = ObjectAllocator.Instance;
             inputHandler = InputHandler.Instance;
             particleHandler = ParticleHandler.Instance; 

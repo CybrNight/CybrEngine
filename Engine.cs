@@ -9,26 +9,22 @@ namespace CybrEngine {
     /// Class defining custom Game type
     /// Allows for different Game to be swapped out
     /// </summary>
-    public abstract class CybrGame : Game {
+    public class Engine : Game {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
         private ObjectAllocator objHandler;
-        private TickHandler tickHandler;
+        private InputHandler inputHandler;
+
         private ParticleHandler particleHandler;
-
-        protected abstract bool LoadGameContent();
-        protected abstract bool GameInit();
-        protected abstract bool GameStart();
-
-        protected abstract void GameUpdate();
-        protected abstract void GameDraw(SpriteBatch spriteBatch);
-        protected abstract void GameStop();
 
         private bool GameRunning { get; set; } = false;
         private bool ContentLoaded { get; set; } = false;
 
-        public CybrGame() {
+        private CybrGame game;
+        private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
+
+        public Engine(CybrGame game) {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
@@ -49,16 +45,18 @@ namespace CybrEngine {
             Assets.GraphicsDevice = GraphicsDevice;
 
             objHandler = Autoload.objAllocator;
-            tickHandler = Autoload.tickHandler;
             particleHandler = Autoload.particleHandler;
+            inputHandler = Autoload.inputHandler;
 
             //Initialize singleton handlers
 
-
+            this.game = game;
+            game.graphics = graphics;
+            game.spriteBatch = spriteBatch;
             IsMouseVisible = true;
         }
 
-        public Entity Instantiate(Entity instance){
+        public Entity Instantiate(Entity instance) {
             return objHandler.AddInstance(instance);
         }
 
@@ -81,6 +79,10 @@ namespace CybrEngine {
             graphics.PreferredBackBufferHeight = Config.WINDOW_HEIGHT;
             graphics.ApplyChanges();
 
+            fixedUpdateRate = (int)(Config.FIXED_UPDATE_FPS == 0 ? 0 : (1000 / (float)Config.FIXED_UPDATE_FPS));
+            Time.fixedUpdateRate = TimeSpan.FromTicks((long)TimeSpan.TicksPerSecond / Config.FIXED_UPDATE_FPS);
+            Time.fixedUpdateMult = (float)DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
+
             base.Initialize();
         }
 
@@ -94,24 +96,55 @@ namespace CybrEngine {
             Assets.AddTexture("blank", _blankTexture);
 
             //After core content loaded, tell game to load unique assets
-            if(LoadGameContent()) {
-                ContentLoaded = GameInit();
-                if (ContentLoaded){
-                    GameRunning = GameStart();
-                    base.LoadContent();
+            if(game.LoadGameContent()) {
+                ContentLoaded = game.GameInit();
+            }
+
+
+
+        }
+
+        float timer = 0.0f;
+        private int fixedUpdateRate;
+        private float fixedUpdateElapsedTime = 0;
+        private const float fixedUpdateDelta = 1.0f / 60.0f;
+        private float fixedDeltaTime = fixedUpdateDelta;
+        private float previousT = 0;
+        private float accumulator = 0.0f;
+        private float maxFrameTime = 10;
+        protected override void Update(GameTime gameTime) {
+            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Time.gameTime = gameTime;
+            if(ContentLoaded) {
+                timer += Time.deltaTime;
+                if(timer > 1f)
+                    GameRunning = game.GameStart();
+                base.LoadContent();
+                if(GameRunning) {
+                    Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                    accumulator += Time.deltaTime;
+
+                    objHandler.Update();
+                    inputHandler.Update();
+                    Time.Update(ref gameTime);
+
+
+                    while(accumulator >= fixedUpdateDelta) {
+                        FixedUpdate();
+                        Time.FixedUpdate(ref gameTime);
+                        accumulator -= fixedDeltaTime;
+                    }
+
+                    Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
                 }
             }
 
-
-           
+            base.Update(gameTime);
         }
 
-        protected override void Update(GameTime gameTime) {
-            Time.gameTime = gameTime;
-            if(GameRunning) {
-                tickHandler.Update(gameTime);
-            }
-            base.Update(gameTime);
+        private void FixedUpdate(){
+            objHandler.FixedUpdate();
         }
 
         protected override void BeginRun() {
@@ -128,16 +161,24 @@ namespace CybrEngine {
 
         protected override void Draw(GameTime gameTime) {
             if(!ContentLoaded) return;
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
 
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
             particleHandler.Draw(spriteBatch);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             objHandler.Draw(spriteBatch);
 
-            GameDraw(spriteBatch);
+            game.DebugDraw(spriteBatch);
+
             spriteBatch.End();
+
             base.Draw(gameTime);
+        }
+
+        public void Dispose() {
+            throw new NotImplementedException();
         }
     }
 }
