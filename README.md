@@ -1,5 +1,5 @@
 # CybrEngine
-![images](https://github.com/CybrNight/CybrEngine/assets/14323993/6bfe142f-45d3-4429-928d-6787ebded80b)
+![4772066](https://github.com/CybrNight/CybrEngine/assets/14323993/5102438e-352e-4028-9263-8eb648098d11)
 
 ## What is this?
 CybrEngine is a WIP 2D-Game Engine with a focus on arcade-style games
