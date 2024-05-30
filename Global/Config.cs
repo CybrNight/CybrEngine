@@ -33,6 +33,7 @@ namespace CybrEngine {
 
         public static Color BACKGROUND_COLOR { get; set; } = Color.Black;
 
+        public static bool PAUSED { get; set; } = false;
         public static float CHARACTER_SPEED { get; set; } = 80f;
         public static int GRID { get; set; } = 16;
         public static float HORIZONTAL_FRICTION { get; set; } = 0.4f;

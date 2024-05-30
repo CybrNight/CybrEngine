@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 namespace CybrEngine {
-    internal class ObjectAllocator : IMessageable {
+    internal class ObjectAllocator : IResettable {
         private static ObjectAllocator _instance;
         public static ObjectAllocator Instance {
             get {
@@ -28,6 +28,12 @@ namespace CybrEngine {
             objPool = new List<Entity>();
             objQueue = new Queue<Entity>();
             compAlloc = new ComponentAllocator();
+        }
+
+        public void Reset(){
+            objPool.Clear();
+            objQueue.Clear();
+            compAlloc.Reset();
         }
 
         /// <summary>

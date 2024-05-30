@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace CybrEngine {
-    internal class ComponentAllocator {
+    internal class ComponentAllocator : IResettable {
 
         private Dictionary<Entity, List<Component>> cMap;
-        private ObjectAllocator _objHandler;
 
         /// <summary>
         /// Gets all Components from Entity
@@ -102,6 +102,10 @@ namespace CybrEngine {
                 }
             }
             return result;
+        }
+
+        public void Reset() {
+            cMap.Clear();
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class ParticleHandler {
+    public class ParticleHandler : IResettable {
 
         private static ParticleHandler instance;
         public static ParticleHandler Instance {
@@ -30,6 +30,15 @@ namespace CybrEngine {
                 var particle = particles[i];
                 if(!particle.IsDestroyed) {
                     particle.Draw(spriteBatch);
+                }
+            }
+        }
+
+        public void Update(){
+            for(int i = 0; i < particles.Count; i++) {
+                var particle = particles[i];
+                if(!particle.IsDestroyed) {
+                    particle.Update();
                 } else {
                     particles.Remove(particle);
                 }
@@ -40,6 +49,10 @@ namespace CybrEngine {
             particle.Transform.Position = position;
             particles.Add(particle);
             return particle;
+        }
+
+        public void Reset() {
+            particles.Clear();
         }
     }
 }

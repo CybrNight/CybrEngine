@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public class SceneManager {
+    public class SceneManager : IResettable {
         private static SceneManager _instance;
         public static Scene currentScene;
 
@@ -22,6 +22,10 @@ namespace CybrEngine {
         public static void LoadScene(Scene scene){
             currentScene = scene;
             scene.LoadObjects();
+        }
+
+        public void Reset() {
+            currentScene = null;
         }
     }
 }

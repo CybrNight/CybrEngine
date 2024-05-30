@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Security.AccessControl;
+using System.Text.Json.Serialization;
 
 namespace CybrEngine {
     /// <summary>
@@ -10,21 +11,46 @@ namespace CybrEngine {
     /// Allows for different Game to be swapped out
     /// </summary>
     public class Engine : Game {
+        
+        //Defines the lowest level of game to engine access
+        public static class EntryPoint {
+            private static Engine engine;
+            static EntryPoint() {
+                engine = new Engine();
+            }
+
+            public static void Load(CybrGame game) {
+                engine.LoadGame(game);
+            }
+
+            public static void Run(){
+                engine.Run();
+            }
+
+            public static void Update() {
+                var kstate = Keyboard.GetState();
+                if(kstate.IsKeyDown(Keys.Escape)) {
+                    engine.StartGame();
+                }
+            }
+        }
+
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private ObjectAllocator objHandler;
+        private ObjectAllocator objAlloc;
         private InputHandler inputHandler;
 
         private ParticleHandler particleHandler;
 
         private bool GameRunning { get; set; } = false;
         private bool ContentLoaded { get; set; } = false;
+        private bool GameStopping  {  get; set; } = false;  
 
         private CybrGame game;
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
-        public Engine() {
+        private Engine() {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
@@ -44,32 +70,41 @@ namespace CybrEngine {
             Assets.Content = Content;
             Assets.GraphicsDevice = GraphicsDevice;
 
-            objHandler = Autoload.objAllocator;
+            objAlloc = Autoload.objAllocator;
             particleHandler = Autoload.particleHandler;
             inputHandler = Autoload.inputHandler;
 
             //Initialize singleton handlers
         }
 
-        public void LoadGame(CybrGame game){
+        public void StartGame(){
+            game.GameInit();
+            GameRunning = game.GameStart();
+        }
+
+        public void LoadGame(CybrGame game) {
             this.game = game;
+            game.graphics = graphics;
+            game.spriteBatch = spriteBatch;
+
+            ContentLoaded = game.LoadContent();
         }
 
         public Entity Instantiate(Entity instance) {
-            return objHandler.AddInstance(instance);
+            return objAlloc.AddInstance(instance);
         }
 
         public T Instantiate<T>(float x, float y) where T : Entity {
-            return objHandler.Instantiate<T>(new Vector2(x, y));
+            return objAlloc.Instantiate<T>(new Vector2(x, y));
         }
 
         public T Instantiate<T>(Vector2 position) where T : Entity {
-            return objHandler.Instantiate<T>(position);
+            return objAlloc.Instantiate<T>(position);
         }
 
 
         public T Instantiate<T>() where T : Entity {
-            return objHandler.Instantiate<T>(new Vector2());
+            return objAlloc.Instantiate<T>(new Vector2());
         }
 
         protected sealed override void Initialize() {
@@ -95,13 +130,13 @@ namespace CybrEngine {
             Assets.AddTexture("blank", _blankTexture);
 
             IsMouseVisible = true;
+        }
 
-            //After core content loaded, tell game to load unique assets
-            if(game.LoadGameContent()) {
-                game.graphics = graphics;
-                game.spriteBatch = spriteBatch;
-                ContentLoaded = game.GameInit();
-            }
+        public void Stop() {
+            GameRunning = false;
+            GameStopping = true;
+            Autoload.Reset();
+            ContentLoaded = false;
         }
 
         float timer = 0.0f;
@@ -113,20 +148,32 @@ namespace CybrEngine {
         private float accumulator = 0.0f;
         private float maxFrameTime = 10;
         protected override void Update(GameTime gameTime) {
+            var kstate = Keyboard.GetState();
             Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Time.gameTime = gameTime;
+
+            if(!GameRunning) {
+                EntryPoint.Update();
+                return;
+            }
+            
             if(ContentLoaded) {
-                timer += Time.deltaTime;
-                if(timer > 1f)
-                    GameRunning = game.GameStart();
-                base.LoadContent();
+                if(kstate.IsKeyDown(Keys.Enter)) {
+                    Config.PAUSED = !Config.PAUSED;
+                }
+                if(kstate.IsKeyDown(Keys.Back)) {
+                    Stop();
+                }
                 if(GameRunning) {
                     Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                     accumulator += Time.deltaTime;
 
-                    objHandler.Update();
-                    inputHandler.Update();
+                    if (!Config.PAUSED){
+                        objAlloc.Update();
+                        inputHandler.Update();
+                        particleHandler.Update();
+                    }
                     Time.Update(ref gameTime);
 
 
@@ -138,14 +185,13 @@ namespace CybrEngine {
 
                     Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
                 }
-            }
 
-            var kstate = Keyboard.GetState();
+            }
             base.Update(gameTime);
         }
 
-        private void FixedUpdate(){
-            objHandler.FixedUpdate();
+        private void FixedUpdate() {
+            objAlloc.FixedUpdate();
         }
 
         protected override void BeginRun() {
@@ -161,25 +207,24 @@ namespace CybrEngine {
         }
 
         protected override void Draw(GameTime gameTime) {
-            if(!ContentLoaded) return;
-            GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
+            GraphicsDevice.Clear(Color.Gray);
+            if(ContentLoaded){
+                GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-            particleHandler.Draw(spriteBatch);
-            spriteBatch.End();
+                if (GameRunning){
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                    particleHandler.Draw(spriteBatch);
+                    spriteBatch.End();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
-            objHandler.Draw(spriteBatch);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+                    objAlloc.Draw(spriteBatch);
 
-            game.DebugDraw(spriteBatch);
-
-            spriteBatch.End();
+                    game.DebugDraw(spriteBatch);
+                    spriteBatch.End();
+                }
+            }
 
             base.Draw(gameTime);
-        }
-
-        public void Dispose() {
-            throw new NotImplementedException();
         }
     }
 }

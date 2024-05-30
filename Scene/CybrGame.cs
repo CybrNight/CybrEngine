@@ -15,13 +15,13 @@ namespace CybrEngine {
 
         private ObjectAllocator objAlloc;
 
-        public abstract bool LoadGameContent();
+        public abstract bool LoadContent();
         public abstract bool GameInit();
         public abstract bool GameStart();
-
         public abstract void GameUpdate();
-        public abstract void DebugDraw(SpriteBatch spriteBatch);
         public abstract void GameStop();
+
+        public abstract void DebugDraw(SpriteBatch spriteBatch);
 
         private bool GameRunning { get; set; } = false;
         private bool ContentLoaded { get; set; } = false;
