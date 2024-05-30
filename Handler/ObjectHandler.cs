@@ -36,7 +36,6 @@ namespace CybrEngine {
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
             compAlloc.Draw(spriteBatch);
-            objPool.Sort((x, y) => x.sortingLayer.CompareTo(y.sortingLayer));
             for (int i = 0; i < objPool.Count; i++) {
                 GameObject obj = objPool[i];
                 if (obj is Entity){
@@ -89,8 +88,8 @@ namespace CybrEngine {
                         var e2 = ents[j];
                         if(e1 != e2 && e2.IsActive) {
                             if(e1.Intersects(e2)) {
-                                e1.OnIntersection(e2);
-                                e2.OnIntersection(e1);
+                                e1.SendMessage("_OnIntersection", new object[] {e2});
+                                e2.SendMessage("_OnIntersection", new object[] { e1 });
                             }
                         }
                     }
@@ -119,7 +118,7 @@ namespace CybrEngine {
             var type = typeof(T);
             GameObject newObject = null;
             if (typeof(GameObject).IsAssignableFrom(typeof(T))){
-                newObject = GameObject.Factory<T>.Instantiate(this);
+                newObject = GameObject.GameObjectFactory<T>.Construct(this);
                 newObject.Transform.Position = position;
 
                 if (newObject is Entity){

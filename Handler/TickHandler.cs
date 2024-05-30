@@ -31,47 +31,32 @@ namespace CybrEngine {
 
         private int fixedUpdateRate;
         private float fixedUpdateElapsedTime = 0;
-        private float fixedUpdateDelta = 0.33f;
+        private const float fixedUpdateDelta = 1.0f/60.0f;
+        private float fixedDeltaTime = fixedUpdateDelta;
         private float previousT = 0;
         private float accumulator = 0.0f;
-        private float maxFrameTime = 250;
+        private float maxFrameTime = 10;
         public void Update(GameTime gameTime) {
-            if(gameTime.ElapsedGameTime.TotalSeconds > 0.1) {
-                accumulator = 0;
-                previousT = 0;
-                return;
-            }
+            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if(previousT == 0) {
-                fixedUpdateDelta = fixedUpdateRate;
-                previousT = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            }
+            accumulator += Time.deltaTime;
+
             _objHandler.Update();
             _inputHandler.Update();
             Time.Update(ref gameTime);
 
-            float now = (float)gameTime.TotalGameTime.TotalMilliseconds;
-            Time.frameTime = now - previousT;
-
-            if(Time.frameTime > maxFrameTime) {
-                Time.frameTime = maxFrameTime;
-            }
-            previousT = now;
-
-            accumulator += Time.frameTime;
 
             while(accumulator >= fixedUpdateDelta) {
                 FixedUpdate();
                 Time.FixedUpdate(ref gameTime);
-                fixedUpdateElapsedTime += fixedUpdateDelta;
-                accumulator -= fixedUpdateDelta;
+                accumulator -= fixedDeltaTime;
             }
 
             Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
         }
 
         public void Draw(SpriteBatch spriteBatch) {
-            _objHandler.Draw(spriteBatch);
+         
             // TODO: Add your drawing code here
         }
 

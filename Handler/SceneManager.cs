@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CybrEngine.Handler {
+namespace CybrEngine {
     public class SceneManager {
         private static SceneManager _instance;
         public static Scene currentScene;
