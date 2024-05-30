@@ -25,11 +25,7 @@ namespace CybrEngine {
         /// Update all 
         /// </summary>
         public void Update(){
-            foreach(var cList in cMap.Values){
-                foreach(var c in cList) {
-                    c.Update();
-                }
-            }   
+            
         }
 
         /// <summary>

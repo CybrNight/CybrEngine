@@ -9,7 +9,6 @@ namespace CybrEngine {
         }
 
         public Vector2 Scale { get; set; } = Vector2.One;
-
         public Vector2 Offset { get; set; } = Vector2.Zero;
         public Texture2D Texture { get; private set; }
         public Color Color { get; set; } = Color.White;
@@ -20,6 +19,10 @@ namespace CybrEngine {
             Texture = texture;
         }
 
+        /// <summary>
+        /// Draws stored Texture
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch){
             if(Texture == null) return;
 
@@ -31,6 +34,9 @@ namespace CybrEngine {
             0f);
         }
 
+        /// <summary>
+        /// Cleanup unmanaged data
+        /// </summary>
         private void _Cleanup() {
             Texture = null;
         }

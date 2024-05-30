@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary
-/// Defines generic Component base class
-/// </summary>
 namespace CybrEngine {
+    /// <summary>
+    /// Defines base class for Component
+    /// </summary>
     public abstract class Component : Object {
         public static T Create<T>(GameObject entity) where T : Component{
             var component = Builder.Component<T>();
@@ -17,11 +17,16 @@ namespace CybrEngine {
             Entity = null;
         }
 
-        public virtual void Update(){ }
-
         public virtual void Draw(SpriteBatch spriteBatch) { }
 
+        /// <summary>
+        /// Owner of Component
+        /// </summary>
         public GameObject Entity { get; private set; }
+
+        /// <summary>
+        /// Defines if Component should be the only one allowed on Entity
+        /// </summary>
         public bool Unique { get; set; } = false;
 
         public override bool Equals(object obj) {
@@ -33,15 +38,30 @@ namespace CybrEngine {
             return HashCode.Combine(Name);
         }
 
-        // Overload bool to allow null checks
+        /// <summary>
+        /// Overload of bool operator
+        /// </summary>
+        /// <param name="component"></param>
         public static implicit operator bool(Component component) {
             return (component != null);
         }
 
+        /// <summary>
+        /// Overload == for Component comparison
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator ==(Component left, Component right) {
             return EqualityComparer<Component>.Default.Equals(left, right);
         }
 
+        /// <summary>
+        /// Overload != for Component comparison
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator !=(Component left, Component right) {
             return !(left == right);
         }
