@@ -4,39 +4,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace CybrEngine {
-    public static class GameObjectExtensions { 
-        public static GameObject Instance(this GameObject obj){
-            return GameObject.Factory<GameObject>.Instance(obj);
-        }
-    }
-
-    public abstract class GameObject : Object {
-        internal static class Factory<T> where T : GameObject {
-            /// <summary>
-            /// Creates a copy instance of GameObject
-            /// </summary>
-            /// <param name="obj"></param>
-            /// <returns></returns>
-            internal static T Instance(GameObject obj) {
-                var gameObject = Builder.GameObject<T>();
-                gameObject.objHandler = obj.objHandler;
-                gameObject.Transform = obj.Transform;
-                return gameObject;
-            }
-
-            internal static void Construct(ref GameObject obj){
-                obj.objHandler = ObjectHandler.Instance;
-            }
-
-            internal static T Instantiate(ObjectHandler objHandler) {
-                var gameObject = Builder.GameObject<T>();
-                gameObject.Name = gameObject.GetType().Name;
-                gameObject.objHandler = objHandler;
-                return gameObject;
-            }
-        }
-
-        internal ObjectHandler objHandler;
+    public abstract partial class GameObject : Object{
+        private ObjectHandler objHandler;
+        private ParticleHandler particleHandler;
 
         public Transform Transform { get; private set; }
         public int sortingLayer = 0;
@@ -59,28 +29,34 @@ namespace CybrEngine {
         }
 
 
+        /// <summary>
+        /// Returns Transform.Velocity
+        /// </summary>
         public Vector2 Velocity {
             get { return Transform.Velocity; }
         }
 
+        /// <summary>
+        /// Chekcs if two GameObjects are intersecting
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Intersects(GameObject other) {
             return Transform.Bounds.Intersects(other.Transform.Bounds);
         }
 
-        public virtual void OnIntersection(GameObject other) { }
-
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return ObjectHandler.Instance.AddComponent<T>(this);
+            return objHandler.AddComponent<T>(this);
         }
 
         //Handles retrieving Componenet from Entity
         public T GetComponent<T>() where T : Component {
-            return ObjectHandler.Instance.GetComponent<T>(this);
+            return objHandler.GetComponent<T>(this);
         }
 
         public List<T> GetComponents<T>() where T : Component {
-            return ObjectHandler.Instance.GetComponents<T>(this);
+            return objHandler.GetComponents<T>(this);
         }
 
         public override bool Equals(object obj) {
@@ -101,7 +77,7 @@ namespace CybrEngine {
         }
 
         public Particle EmitParticle(Particle particle, Vector2 position){
-            return ParticleHandler.Instance.Emit(particle, position);
+            return particleHandler.Emit(particle.Instance(), position);
         }
 
         public T Instantiate<T>() where T : GameObject {
@@ -109,7 +85,7 @@ namespace CybrEngine {
         }
 
         public T Instantiate<T>(Vector2 position) where T : GameObject {
-            return ObjectHandler.Instance.Instantiate<T>(position);
+            return objHandler.Instantiate<T>(position);
         }
 
         public T FindObjectOfType<T>() where T : GameObject{

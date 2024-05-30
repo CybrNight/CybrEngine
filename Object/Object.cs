@@ -4,15 +4,15 @@ using System.Diagnostics;
 using System.Numerics;
 
 namespace CybrEngine {
-    public abstract class Object : IMessageable {
 
-        public string Name { get; protected set; }
+    public  abstract partial class Object : IMessageable {
+        public string Name { get; set; }
 
-        private bool Active { get; set; }
+        protected bool Active { get; set; }
 
-        public bool IsCreated { get; private set; }
-        protected bool Destroyed { get; set; }
-        protected bool BeingDestroyed { get; set; }
+        public bool IsCreated { get; private set; } = false;
+        protected bool Destroyed { get; set; } = false;
+        protected bool BeingDestroyed { get; set; } = false;
         public int ID { get; private set; }
         private static int GLOBAL_ID { get; set; } = 0;
 
@@ -25,6 +25,14 @@ namespace CybrEngine {
         /// Marks Object for destruction
         /// </summary>
         public void Destroy() { BeingDestroyed = true; }
+        public Object Clone() {
+            var clone = (Object)MemberwiseClone();
+            clone.Name = Name;
+            clone.ID = GLOBAL_ID++;
+            clone.Active = Active;
+            return clone;
+        }
+
 
         public override bool Equals(object obj) {
             return obj is Object @object &&
