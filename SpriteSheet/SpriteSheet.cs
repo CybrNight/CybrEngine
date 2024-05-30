@@ -15,7 +15,7 @@ namespace CybrEngine {
         }
 
         public void Destroy() {
-            Source.Dispose();
+            Source = null;
         }
 
 

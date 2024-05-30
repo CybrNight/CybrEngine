@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CybrEngine {
 
@@ -14,8 +15,18 @@ namespace CybrEngine {
             _inputHandler = InputHandler.Instance;
         }
 
+        public static Keys[] PressedKeys => Keyboard.GetState().GetPressedKeys();
+
         public static bool GetKey(Keys key) {
             return _inputHandler.GetKey(key);
+        }
+
+        public static bool GetKeyDown(Keys key){
+            return _inputHandler.GetKeyDown(key);
+        }
+
+        public static bool GetKeyUp(Keys key){
+            return _inputHandler.GetKeyUp(key);
         }
 
         public static int GetAxisRaw(string axis) {
@@ -56,13 +67,17 @@ namespace CybrEngine {
 
         }
 
-        private void ResetKey(Keys key) {
-            pressedKeys[key] = 0;
-        }
 
         //Update all input Dictionary
         public void Update() {
             var kstate = Keyboard.GetState();
+
+            foreach(Keys key in pressedKeys.Keys) {
+                if (kstate.IsKeyUp(key)){
+                    pressedKeys.Remove(key);
+                    return;
+                }
+            }
 
             //Update Horizontal, and Vertical axes with directional int value
             axes["Horizontal"] = (-GetKeyVal(Keys.Left) + GetKeyVal(Keys.Right));
@@ -71,29 +86,16 @@ namespace CybrEngine {
             //Check state of all pressedKeys
             foreach(Keys key in kstate.GetPressedKeys()) {
                 //If key no longer held, reset pressed time
-                if(!pressedKeys.ContainsKey(key)) {
-                    ResetKey(key);
-                }
-
-                //Incrament pressed frames count;
-                if(pressedKeys[key] < 1) {
+                if(pressedKeys.ContainsKey(key)) {
                     pressedKeys[key] += Time.deltaTime;
+                }else{
+                    pressedKeys[key] = 0;
                 }
             }
-
-            //Check if any Keys released this frame
-            foreach(Keys key in pressedKeys.Keys) {
-                //If key released reset value in pressedKeys
-                if(kstate.IsKeyUp(key)) {
-                    ResetKey(key);
-                }
-            }
-
-
         }
 
         public int GetAxisRaw(string axis) {
-            return axes[axis].CeilToInt();
+            return Mathf.CeilToInt(axes[axis]);
         }
 
         public float GetAxis(string axis) {
@@ -103,11 +105,12 @@ namespace CybrEngine {
         //Check if Key is currently pressed
         public bool GetKey(Keys key) {
             var kstate = Keyboard.GetState();
-            if(!pressedKeys.ContainsKey(key)) {
-                return false;
-            }
+            return kstate.IsKeyDown(key);
+        }
 
-            return (kstate.IsKeyDown(key));
+        public bool GetKeyUp(Keys key) {
+            var kstate = Keyboard.GetState();
+            return (kstate.IsKeyUp(key));
         }
 
         //Gets current state of a Key as Int
@@ -120,11 +123,8 @@ namespace CybrEngine {
             if(!pressedKeys.ContainsKey(key)) {
                 return false;
             }
-            return (pressedKeys[key] > 1);
-        }
 
-        void IMessageable.SendMessage(string name, object[] args) {
-            Messager.Instance.SendMessage(this, name, args);
+            return (pressedKeys[key] > 0 && pressedKeys[key] < 0.25);
         }
     }
 }

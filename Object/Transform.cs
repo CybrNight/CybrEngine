@@ -10,11 +10,15 @@ namespace CybrEngine {
         public Vector2 Velocity { get; set; }
         public Vector2 Scale { get; set; }
         public Rectangle Bounds {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, 32, 32); }
+            get { return new Rectangle((int)Position.X, (int)Position.Y, 32*(int)Scale.X, (int)Scale.Y*32); }
 
         }
 
-        ~Transform() {
+        public void Translate(Vector2 translation) {
+            Position += translation;
+        }
+
+        public Transform(): this(0, 0){
 
         }
 

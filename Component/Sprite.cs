@@ -1,47 +1,38 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace CybrEngine {
-    public class Sprite : Component, IDrawComponent {
+    public class Sprite : Component {
 
-        public Sprite() {
-            Name = "SpriteRenderer";
-
+        private Sprite() {
+            Name = "Sprite";
         }
 
-        public Transform Transform { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
 
-        public Vector2 Offset { get; set; }
+        public Vector2 Offset { get; set; } = Vector2.Zero;
         public Texture2D Texture { get; private set; }
+        public Color Color { get; set; } = Color.White;
 
-        public Rectangle Bounds {
-            get { return Texture.Bounds; }
+        public Rectangle Bounds => Texture.Bounds;
+
+        public void SetTexture(Texture2D texture) {
+            Texture = texture;
         }
 
-        public void SetTexture(string path) {
-            Texture = Assets.GetTexture(path);
-        }
-
-        protected override void _Cleanup() {
-            Texture = null;
-            Transform = null;
-        }
-
-        public override void Draw(SpriteBatch spriteBatch) {
+        public override void Draw(SpriteBatch spriteBatch){
             if(Texture == null) return;
 
-
-            spriteBatch.Draw(Texture, Transform.Position, null, Color.White, 0f,
-            Transform.Origin,
-            Transform.Scale,
+            var transform = Entity.Transform;
+            spriteBatch.Draw(Texture, transform.Position, transform.Bounds, Color, 0f,
+            transform.Origin,
+            transform.Scale,
             SpriteEffects.None,
             0f);
         }
 
-        public override Type ComponentType {
-            get { return typeof(IDrawComponent); }
+        private void _Cleanup() {
+            Texture = null;
         }
     };
 }

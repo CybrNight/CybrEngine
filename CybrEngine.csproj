@@ -7,8 +7,4 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Singleton\" />
-    <Folder Include="Time\" />
-  </ItemGroup>
 </Project>

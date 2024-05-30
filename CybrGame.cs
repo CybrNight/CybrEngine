@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
+using System.Security.AccessControl;
 
 namespace CybrEngine {
     /// <summary>
@@ -11,53 +13,72 @@ namespace CybrEngine {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private ObjectHandler objHandler;
-        private InputHandler inputHandler;
-        private Messager messager;
-
-        private int fixedUpdateRate;
-
+        private ObjectAllocator objHandler;
+        private TickHandler tickHandler;
+        private ParticleHandler particleHandler;
 
         protected abstract bool LoadGameContent();
         protected abstract bool GameInit();
         protected abstract bool GameStart();
 
         protected abstract void GameUpdate();
-        protected abstract void GameDraw();
+        protected abstract void GameDraw(SpriteBatch spriteBatch);
         protected abstract void GameStop();
 
-        private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
+        private bool GameRunning { get; set; } = false;
+        private bool ContentLoaded { get; set; } = false;
 
-        private bool GameRunning { get; set; }
-
-        public CybrGame() : base() {
+        public CybrGame() {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            Assets.Content = Content;
 
+            IsMouseVisible = true;
+            IsFixedTimeStep = false;
+
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
+            Window.IsBorderless = false;
+            graphics.IsFullScreen = true;
+            graphics.HardwareModeSwitch = true;
+            graphics.SynchronizeWithVerticalRetrace = true;
+            graphics.ApplyChanges();
+
+            Content.RootDirectory = "Content";
+            Assets.Content = Content;
+            Assets.GraphicsDevice = GraphicsDevice;
+
+            objHandler = Autoload.objAllocator;
+            tickHandler = Autoload.tickHandler;
+            particleHandler = Autoload.particleHandler;
 
             //Initialize singleton handlers
-            messager = Messager.Instance;
-            inputHandler = InputHandler.Instance;
-            objHandler = ObjectHandler.Instance;
+
 
             IsMouseVisible = true;
         }
 
-        public Object Instantiate<T>() where T : Entity {
-            return ObjectHandler.Instance.Instantiate<T>();
+        public GameObject Instantiate(GameObject instance){
+            return objHandler.AddInstance(instance);
+        }
+
+        public T Instantiate<T>(float x, float y) where T : GameObject {
+            return objHandler.Instantiate<T>(new Vector2(x, y));
+        }
+
+        public T Instantiate<T>(Vector2 position) where T : GameObject {
+            return objHandler.Instantiate<T>(position);
+        }
+
+
+        public T Instantiate<T>() where T : GameObject {
+            return objHandler.Instantiate<T>(new Vector2());
         }
 
         protected sealed override void Initialize() {
-            // TODO: Add your initialization logic here
-            fixedUpdateRate = (int)(Config.FIXED_UPDATE_FPS == 0 ? 0 : (1000 / (float)Config.FIXED_UPDATE_FPS));
-            Time.fixedUpdateRate = TimeSpan.FromTicks((long)TimeSpan.TicksPerSecond / Config.FIXED_UPDATE_FPS);
-            Time.fixedUpdateMult = (float)DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
-
             graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = Config.RES_X;
-            graphics.PreferredBackBufferHeight = Config.RES_Y;
+            graphics.PreferredBackBufferWidth = Config.WINDOW_WIDTH;
+            graphics.PreferredBackBufferHeight = Config.WINDOW_HEIGHT;
             graphics.ApplyChanges();
 
             base.Initialize();
@@ -66,79 +87,57 @@ namespace CybrEngine {
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            var _blankTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            _blankTexture.SetData(new[] { Color.White });
+
+            Assets.AddTexture("missing_tex", new Texture2D(GraphicsDevice, 32, 32));
+            Assets.AddTexture("blank", _blankTexture);
+
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()) {
-
-                if(GameInit()) { //If content loaded, tell game to init
-                    GameRunning = GameStart();
+                if (GameInit()){
+                    ContentLoaded = GameStart();
+                    base.LoadContent();
                 }
             }
 
-            if(!GameRunning) {
-                Exit();
-            }
+
+           
         }
 
-
-        private float fixedUpdateElapsedTime = 0;
-        private float fixedUpdateDelta = 0.33f;
-        private float previousT = 0;
-        private float accumulator = 0.0f;
-        private float maxFrameTime = 250;
-
         protected override void Update(GameTime gameTime) {
-
-            if(gameTime.ElapsedGameTime.TotalSeconds > 0.1) {
-                accumulator = 0;
-                previousT = 0;
-                return;
-            }
-
-            if(previousT == 0) {
-                fixedUpdateDelta = fixedUpdateRate;
-                previousT = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            }
-            Time.Update(ref gameTime);
-
-            float now = (float)gameTime.TotalGameTime.TotalMilliseconds;
-            Time.frameTime = now - previousT;
-
-            if(Time.frameTime > maxFrameTime) {
-                Time.frameTime = maxFrameTime;
-            }
-            previousT = now;
-
-            accumulator += Time.frameTime;
-
+            Time.gameTime = gameTime;
             if(GameRunning) {
-                objHandler.Update();
-                inputHandler.Update();
-                GameUpdate();
-
-                while(accumulator >= fixedUpdateDelta) {
-                    objHandler.FixedUpdate();
-                    Time.FixedUpdate(ref gameTime);
-                    fixedUpdateElapsedTime += fixedUpdateDelta;
-                    accumulator -= fixedUpdateDelta;
-                }
+                tickHandler.Update(gameTime);
+            }else if (ContentLoaded){
+                GameRunning = true;
             }
-
-            Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
-
             base.Update(gameTime);
         }
 
+        protected override void BeginRun() {
+            base.BeginRun();
+        }
+
+        protected override void EndDraw() {
+            base.EndDraw();
+        }
+
+        protected override bool BeginDraw() {
+            return base.BeginDraw();
+        }
+
         protected override void Draw(GameTime gameTime) {
+            if(!GameRunning) return;
 
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            spriteBatch.Begin();
-            if(GameRunning) {
-                objHandler.Draw(spriteBatch);
-                GameDraw();
-            }
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+            GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
+
+            particleHandler.Draw(spriteBatch);
+            objHandler.Draw(spriteBatch);
+
+            GameDraw(spriteBatch);
             spriteBatch.End();
-            // TODO: Add your drawing code here
-
             base.Draw(gameTime);
         }
     }

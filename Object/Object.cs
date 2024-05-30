@@ -1,47 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace CybrEngine {
-    public abstract class Object {
+    public abstract class Object : IMessageable {
+        internal static class Factory<T> where T : Object {
+            /// <summary>
+            /// Constructs new instance of Object
+            /// </summary>
+            /// <returns></returns>
+            public static T Construct(Type[] paramTypes, object[] paramVals) {
+                var obj = Builder.Construct<T>(paramTypes, paramVals);
 
-        internal Messager messager;
+                obj.objAlloc = Autoload.objAllocator;
+                obj.particleHandler= Autoload.particleHandler;
+                obj.Name = obj.GetType().ToString();
 
-        public string Name { get; protected set; }
+                return obj;
+            }
 
-        private bool Active { get; set; } = false;
+            public static T Construct(){
+                return Construct(new Type[] { }, null);
+            }
 
-        public bool IsCreated { get; private set; } = false;
-        protected bool Destroyed { get; set; }
-        protected bool BeingDestroyed { get; set; }
-        public int ID { get; private set; }
-        private static int GLOBAL_ID { get; set; } = 0;
-
-        public bool IsActive {
-            get { return Active || IsDestroyed; }
-        }
-
-        public bool IsDestroyed {
-            get {
-                return BeingDestroyed || Destroyed;
+            /// <summary>
+            /// Creates clone of Object instance
+            /// </summary>
+            /// <returns></returns>
+            public static T Instance(Object obj) {
+                var clone = obj.MemberwiseClone() as T;
+                return clone;
             }
         }
 
-        public void Start() {
-            if(IsCreated) return;
-            IsCreated = true;
-        }
+        public string Name { get; set; }
 
-        public virtual void SendMessage(string name) {
-            messager.SendMessage(this, name);
-        }
+        protected bool Active { get; set; }
+
+        public bool IsCreated { get; private set; } = false;
+        protected bool Destroyed { get; set; } = false;
+        protected bool BeingDestroyed { get; set; } = false;
+        public int ID { get; private set; }
+        private static int GLOBAL_ID { get; set; } = 0;
+
+        public bool IsActive => Active || IsDestroyed;
+        public bool IsDestroyed => BeingDestroyed || Destroyed;
 
         public void SetActive(bool value = true) { Active = value; }
-        public void Destroy() { BeingDestroyed = true; _Cleanup(); Destroyed = true; }
+
+        internal ObjectAllocator objAlloc;
+        protected ParticleHandler particleHandler;
 
         /// <summary>
-        /// Function that handles cleaning up un-managed data
+        /// Marks Object for destruction
         /// </summary>
-        protected virtual void _Cleanup() { }
+        public void Destroy() { BeingDestroyed = true; }
+        public Object Clone() {
+            var clone = (Object)MemberwiseClone();
+            clone.Name = Name;
+            clone.ID = GLOBAL_ID++;
+            clone.Active = Active;
+            return clone;
+        }
+
 
         public override bool Equals(object obj) {
             return obj is Object @object &&
@@ -52,11 +74,17 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        protected Object() {
+        public void Print(string value){
+            Debug.WriteLine(value);
+        }
+
+        public Object() {
             ID = GLOBAL_ID++;
             Active = true;
+        }
 
-            messager = Messager.Instance;
+        public T Instantiate<T>() where T : Object {
+            return Builder.Construct<T>();
         }
 
         public static bool operator ==(Object left, Object right) {
