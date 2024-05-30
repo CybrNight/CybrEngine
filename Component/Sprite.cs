@@ -24,7 +24,7 @@ namespace CybrEngine {
             if(Texture == null) return;
 
             var transform = Entity.Transform;
-            spriteBatch.Draw(Texture, transform.Position, null, Color, 0f,
+            spriteBatch.Draw(Texture, transform.Position, transform.Bounds, Color, 0f,
             transform.Origin,
             transform.Scale,
             SpriteEffects.None,
