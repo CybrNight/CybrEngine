@@ -21,6 +21,9 @@ namespace CybrEngine {
             cMap = new Dictionary<GameObject, List<Component>>();
         }
 
+        /// <summary>
+        /// Update all 
+        /// </summary>
         public void Update(){
             foreach(var cList in cMap.Values){
                 foreach(var c in cList) {
@@ -29,6 +32,10 @@ namespace CybrEngine {
             }   
         }
 
+        /// <summary>
+        /// Draw all Components
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch){
             foreach(var cList in cMap.Values) {
                 foreach(var c in cList) {

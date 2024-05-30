@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CybrEngine.Handler;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Security.AccessControl;
 
 namespace CybrEngine {
     /// <summary>
@@ -16,6 +18,7 @@ namespace CybrEngine {
         private ObjectHandler objHandler;
         private InputHandler inputHandler;
         private ParticleHandler particleHandler;
+        private SceneManager sceneManager;
 
         protected abstract bool LoadGameContent();
         protected abstract bool GameInit();
@@ -82,6 +85,7 @@ namespace CybrEngine {
             inputHandler = InputHandler.Instance;
             objHandler = ObjectHandler.Instance;
             particleHandler = ParticleHandler.Instance;
+            sceneManager = SceneManager.Instance;
 
             base.Initialize();
         }
