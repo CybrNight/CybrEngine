@@ -11,7 +11,6 @@ namespace CybrEngine {
                 var gameObject = Builder.GameObject<T>();
 
                 //Set member variables of gameObject
-                gameObject.Active = true;
                 gameObject.Name = gameObject.GetType().ToString();
                 gameObject.Name = gameObject.GetType().Name;
                 gameObject.objAlloc = Autoload.objAllocator;

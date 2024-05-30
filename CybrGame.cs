@@ -95,8 +95,9 @@ namespace CybrEngine {
 
             //After core content loaded, tell game to load unique assets
             if(LoadGameContent()) {
-                if (GameInit()){
-                    ContentLoaded = GameStart();
+                ContentLoaded = GameInit();
+                if (ContentLoaded){
+                    GameRunning = GameStart();
                     base.LoadContent();
                 }
             }
@@ -109,8 +110,6 @@ namespace CybrEngine {
             Time.gameTime = gameTime;
             if(GameRunning) {
                 tickHandler.Update(gameTime);
-            }else if (ContentLoaded){
-                GameRunning = true;
             }
             base.Update(gameTime);
         }
@@ -128,7 +127,7 @@ namespace CybrEngine {
         }
 
         protected override void Draw(GameTime gameTime) {
-            if(!GameRunning) return;
+            if(!ContentLoaded) return;
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             GraphicsDevice.Clear(Config.BACKGROUND_COLOR);

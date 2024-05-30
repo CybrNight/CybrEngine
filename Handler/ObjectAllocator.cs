@@ -130,6 +130,7 @@ namespace CybrEngine {
                 }
 
                 newObject.SendMessage("_Awake");
+                newObject.SetActive(true);
                 objQueue.Enqueue(newObject);
                 return (T)newObject;
             }

@@ -36,7 +36,7 @@ namespace CybrEngine {
 
         public string Name { get; set; }
 
-        protected bool Active { get; set; }
+        protected bool Active { get; set; } = false;
 
         public bool IsCreated { get; private set; } = false;
         protected bool Destroyed { get; set; } = false;
@@ -80,7 +80,6 @@ namespace CybrEngine {
 
         public Object() {
             ID = GLOBAL_ID++;
-            Active = true;
         }
 
         public T Instantiate<T>() where T : Object {
