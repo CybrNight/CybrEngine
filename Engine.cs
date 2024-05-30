@@ -24,7 +24,7 @@ namespace CybrEngine {
         private CybrGame game;
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
-        public Engine(CybrGame game) {
+        public Engine() {
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
@@ -49,11 +49,10 @@ namespace CybrEngine {
             inputHandler = Autoload.inputHandler;
 
             //Initialize singleton handlers
+        }
 
+        public void LoadGame(CybrGame game){
             this.game = game;
-            game.graphics = graphics;
-            game.spriteBatch = spriteBatch;
-            IsMouseVisible = true;
         }
 
         public Entity Instantiate(Entity instance) {
@@ -95,13 +94,14 @@ namespace CybrEngine {
             Assets.AddTexture("missing_tex", new Texture2D(GraphicsDevice, 32, 32));
             Assets.AddTexture("blank", _blankTexture);
 
+            IsMouseVisible = true;
+
             //After core content loaded, tell game to load unique assets
             if(game.LoadGameContent()) {
+                game.graphics = graphics;
+                game.spriteBatch = spriteBatch;
                 ContentLoaded = game.GameInit();
             }
-
-
-
         }
 
         float timer = 0.0f;
@@ -140,6 +140,7 @@ namespace CybrEngine {
                 }
             }
 
+            var kstate = Keyboard.GetState();
             base.Update(gameTime);
         }
 
