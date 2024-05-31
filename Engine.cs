@@ -11,26 +11,38 @@ namespace CybrEngine {
     /// Allows for different Game to be swapped out
     /// </summary>
     public class Engine : Game {
-        
+
+        private static Engine _engine = null;
+        public static Engine Instance {
+            get {
+                if(_engine == null) {
+                    _engine = new Engine();
+                }
+                return _engine;
+            }
+        }
+
+        public static Engine Create(){
+            return Instance;
+        }
+
         //Defines the lowest level of game to engine access
         public static class EntryPoint {
-            private static Engine engine;
-            static EntryPoint() {
-                engine = new Engine();
-            }
+            private static Engine _engine;
 
             public static void Load(CybrGame game) {
-                engine.LoadGame(game);
+                _engine.LoadGame(game);
             }
 
-            public static void Run(){
-                engine.Run();
+            public static void Run() {
+                _engine.Run();
             }
 
             public static void Update() {
                 var kstate = Keyboard.GetState();
                 if(kstate.IsKeyDown(Keys.Escape)) {
-                    engine.StartGame();
+                    _engine.StartGame();
+                    return;
                 }
             }
         }
@@ -43,11 +55,13 @@ namespace CybrEngine {
 
         private ParticleHandler particleHandler;
 
+        private bool GameInitialized { get; set; } = false;
         private bool GameRunning { get; set; } = false;
         private bool ContentLoaded { get; set; } = false;
-        private bool GameStopping  {  get; set; } = false;  
+        private bool GameStopping { get; set; } = false;
 
-        private CybrGame game;
+        private CybrGame _game;
+
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
         private Engine() {
@@ -77,17 +91,14 @@ namespace CybrEngine {
             //Initialize singleton handlers
         }
 
-        public void StartGame(){
-            game.GameInit();
-            GameRunning = game.GameStart();
+        public void StartGame() {
+            Config.PAUSED = false;
         }
 
         public void LoadGame(CybrGame game) {
-            this.game = game;
+            this._game = game;
             game.graphics = graphics;
             game.spriteBatch = spriteBatch;
-
-            ContentLoaded = game.LoadContent();
         }
 
         public Entity Instantiate(Entity instance) {
@@ -130,6 +141,30 @@ namespace CybrEngine {
             Assets.AddTexture("blank", _blankTexture);
 
             IsMouseVisible = true;
+
+
+            if(_game != null) {
+                ContentLoaded = _game.LoadContent();
+                if(ContentLoaded) {
+                    GameInitialized = _game.GameInit();
+                    GameRunning = _game.GameStart();
+                }
+            }
+        }
+
+        public void SwapGames(CybrGame game){
+            Autoload.Reset();
+            GameRunning = false;
+            if(game != null) {
+                _game = game;
+                _game.graphics = graphics;
+                _game.spriteBatch = spriteBatch;
+                ContentLoaded = game.LoadContent();
+                if(ContentLoaded) {
+                    GameInitialized = game.GameInit();
+                    GameRunning = game.GameStart();
+                }
+            }
         }
 
         public void Stop() {
@@ -147,48 +182,41 @@ namespace CybrEngine {
         private float previousT = 0;
         private float accumulator = 0.0f;
         private float maxFrameTime = 10;
+        private const float FixedTimeStep = 1f / 90f; // 60 updates per second
+        private float _accumulatedTime;
+        private TimeSpan _previousGameTime;
+
         protected override void Update(GameTime gameTime) {
             var kstate = Keyboard.GetState();
             Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Time.gameTime = gameTime;
 
-            if(!GameRunning) {
-                EntryPoint.Update();
-                return;
+            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            // Calculate elapsed time since last frame
+            TimeSpan currentGameTime = gameTime.TotalGameTime;
+            float elapsedTime = (float)(currentGameTime - _previousGameTime).TotalSeconds;
+            _previousGameTime = currentGameTime;
+
+            // Accumulate elapsed time
+            _accumulatedTime += elapsedTime;
+
+            objAlloc.Update();
+            inputHandler.Update();
+            particleHandler.Update();
+            _game.GameUpdate();
+
+            // Fixed update loop
+            while(_accumulatedTime >= FixedTimeStep) {
+                FixedUpdate();
+                _accumulatedTime -= FixedTimeStep;
             }
-            
-            if(ContentLoaded) {
-                if(kstate.IsKeyDown(Keys.Enter)) {
-                    Config.PAUSED = !Config.PAUSED;
-                }
-                if(kstate.IsKeyDown(Keys.Back)) {
-                    Stop();
-                }
-                if(GameRunning) {
-                    Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                    accumulator += Time.deltaTime;
+            Time.Update(ref gameTime);
+            Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
 
-                    if (!Config.PAUSED){
-                        objAlloc.Update();
-                        inputHandler.Update();
-                        particleHandler.Update();
-                    }
-                    Time.Update(ref gameTime);
-
-
-                    while(accumulator >= fixedUpdateDelta) {
-                        FixedUpdate();
-                        Time.FixedUpdate(ref gameTime);
-                        accumulator -= fixedDeltaTime;
-                    }
-
-                    Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
-                }
-
-            }
             base.Update(gameTime);
         }
+
 
         private void FixedUpdate() {
             objAlloc.FixedUpdate();
@@ -208,20 +236,19 @@ namespace CybrEngine {
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.Gray);
-            if(ContentLoaded){
+            if(GameInitialized) {
                 GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
 
-                if (GameRunning){
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-                    particleHandler.Draw(spriteBatch);
-                    spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                particleHandler.Draw(spriteBatch);
+                spriteBatch.End();
 
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
-                    objAlloc.Draw(spriteBatch);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+                objAlloc.Draw(spriteBatch);
 
-                    game.DebugDraw(spriteBatch);
-                    spriteBatch.End();
-                }
+                _game.DebugDraw(spriteBatch);
+                spriteBatch.End();
+
             }
 
             base.Draw(gameTime);
