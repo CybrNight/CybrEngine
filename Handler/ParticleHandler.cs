@@ -12,15 +12,15 @@ namespace CybrEngine {
         private static ParticleHandler instance;
         public static ParticleHandler Instance {
             get {
-                if (instance == null) {
+                if(instance == null) {
                     instance = new ParticleHandler();
                 }
                 return instance;
             }
         }
 
-        private ParticleHandler(){
-            
+        private ParticleHandler() {
+
         }
 
         private List<Particle> particles = new List<Particle>();
@@ -34,7 +34,7 @@ namespace CybrEngine {
             }
         }
 
-        public void Update(){
+        public void Update() {
             for(int i = 0; i < particles.Count; i++) {
                 var particle = particles[i];
                 if(!particle.IsDestroyed) {

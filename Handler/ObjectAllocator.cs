@@ -88,8 +88,8 @@ namespace CybrEngine {
                     e1.SendMessage("_FixedUpdate");
 
                     //Update Position based on Velocity
-                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * 0.5f,
-                                             e1.Transform.Position.Y - e1.Velocity.Y * 0.5f);
+                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.timeScale,
+                                             e1.Transform.Position.Y - e1.Velocity.Y * Time.timeScale);
 
                     //Check all Entity for collision
                     for(int j = 0; j < ents.Count; j++) {
@@ -113,6 +113,7 @@ namespace CybrEngine {
                 var obj = objQueue.Dequeue();
                 objPool.Add(obj);
                 obj.SendMessage("_Start");
+                obj.SetActive(true);
             }
         }
 
@@ -130,7 +131,6 @@ namespace CybrEngine {
                 newObject.Transform.Position = position;
 
                 newObject.SendMessage("_Awake");
-                newObject.SetActive(true);
                 objQueue.Enqueue(newObject);
                 return (T)newObject;
             }

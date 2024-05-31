@@ -22,7 +22,7 @@ namespace CybrEngine {
             }
         }
 
-        public static Engine Create(){
+        public static Engine Create() {
             return Instance;
         }
 
@@ -92,7 +92,7 @@ namespace CybrEngine {
         }
 
         public void StartGame() {
-            Config.PAUSED = false;
+
         }
 
         public void LoadGame(CybrGame game) {
@@ -152,7 +152,7 @@ namespace CybrEngine {
             }
         }
 
-        public void SwapGames(CybrGame game){
+        public void SwapGames(CybrGame game) {
             Autoload.Reset();
             GameRunning = false;
             if(game != null) {
@@ -187,34 +187,40 @@ namespace CybrEngine {
         private TimeSpan _previousGameTime;
 
         protected override void Update(GameTime gameTime) {
-            var kstate = Keyboard.GetState();
-            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Time.gameTime = gameTime;
+            if(GameInitialized) {
+                _game.GameUpdate();
+                inputHandler.Update();
 
-            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            // Calculate elapsed time since last frame
-            TimeSpan currentGameTime = gameTime.TotalGameTime;
-            float elapsedTime = (float)(currentGameTime - _previousGameTime).TotalSeconds;
-            _previousGameTime = currentGameTime;
 
-            // Accumulate elapsed time
-            _accumulatedTime += elapsedTime;
+                Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+               
+                if (Time.timeScale == 0.75f){
+                    particleHandler.Update();
+                    objAlloc.Update();
+                }
+                GameRunning = true;
+                // Calculate elapsed time since last frame
+                TimeSpan currentGameTime = gameTime.TotalGameTime;
+                float elapsedTime = (float)(currentGameTime - _previousGameTime).TotalSeconds;
+                _previousGameTime = currentGameTime;
 
-            objAlloc.Update();
-            inputHandler.Update();
-            particleHandler.Update();
-            _game.GameUpdate();
+                // Accumulate elapsed time
+                _accumulatedTime += elapsedTime;
 
-            // Fixed update loop
-            while(_accumulatedTime >= FixedTimeStep) {
-                FixedUpdate();
-                _accumulatedTime -= FixedTimeStep;
+                // Fixed update loop
+                while(_accumulatedTime >= FixedTimeStep) {
+                    FixedUpdate();
+                    _accumulatedTime -= FixedTimeStep;
+                }
+            } else {
+                Time.timeScale = 0;
+                Time.deltaTime = 0;
             }
-
-            Time.Update(ref gameTime);
-            Time.fixedUpdateAlpha = (float)(accumulator / fixedUpdateDelta);
-
             base.Update(gameTime);
+
+
+
         }
 
 
@@ -236,9 +242,9 @@ namespace CybrEngine {
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.Gray);
+
             if(GameInitialized) {
                 GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
-
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 particleHandler.Draw(spriteBatch);
                 spriteBatch.End();
@@ -248,7 +254,6 @@ namespace CybrEngine {
 
                 _game.DebugDraw(spriteBatch);
                 spriteBatch.End();
-
             }
 
             base.Draw(gameTime);
