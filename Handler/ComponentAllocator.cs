@@ -1,35 +1,31 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace CybrEngine {
-    internal class ComponentAllocator {
+    internal class ComponentAllocator : IResettable {
 
-        private Dictionary<GameObject, List<Component>> cMap;
-        private ObjectAllocator _objHandler;
+        private Dictionary<Entity, List<Component>> cMap;
 
         /// <summary>
         /// Gets all Components from Entity
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public List<Component> GetAllComponents(GameObject key){
+        public List<Component> GetAllComponents(Entity key){
             return cMap[key];
         }
 
         public ComponentAllocator() {
-            cMap = new Dictionary<GameObject, List<Component>>();
+            cMap = new Dictionary<Entity, List<Component>>();
         }
 
         /// <summary>
         /// Update all 
         /// </summary>
         public void Update(){
-            foreach(var cList in cMap.Values){
-                foreach(var c in cList) {
-                    c.Update();
-                }
-            }   
+            
         }
 
         /// <summary>
@@ -44,7 +40,7 @@ namespace CybrEngine {
             }
         }
 
-        public void RemoveComponents(GameObject key) {
+        public void RemoveComponents(Entity key) {
             if(cMap.ContainsKey(key)) {
                 for(int i = 0; i < cMap[key].Count; i++) {
                     cMap[key][i].Destroy();
@@ -59,7 +55,7 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public T AddComponent<T>(GameObject entity) where T : Component  {
+        public T AddComponent<T>(Entity entity) where T : Component  {
             var component = Component.Create<T>(entity);
 
             if(!cMap.ContainsKey(entity)) {
@@ -76,7 +72,7 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public T GetComponent<T>(GameObject key) where T : Component {
+        public T GetComponent<T>(Entity key) where T : Component {
             if(!cMap.ContainsKey(key)) {
                 return null;
             }
@@ -91,7 +87,7 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public List<T> GetComponents<T>(GameObject key) where T : Component {
+        public List<T> GetComponents<T>(Entity key) where T : Component {
             if(!cMap.ContainsKey(key)) {
                 return null;
             }
@@ -106,6 +102,10 @@ namespace CybrEngine {
                 }
             }
             return result;
+        }
+
+        public void Reset() {
+            cMap.Clear();
         }
     }
 }

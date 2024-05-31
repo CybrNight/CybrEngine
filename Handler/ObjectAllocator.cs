@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 namespace CybrEngine {
-    internal class ObjectAllocator : IMessageable {
+    internal class ObjectAllocator : IResettable {
         private static ObjectAllocator _instance;
         public static ObjectAllocator Instance {
             get {
@@ -18,16 +18,22 @@ namespace CybrEngine {
             }
         }
 
-        private List<GameObject> objPool;
-        private Queue<GameObject> objQueue;
+        private List<Entity> objPool;
+        private Queue<Entity> objQueue;
 
         private ComponentAllocator compAlloc;
 
 
         private ObjectAllocator() {
-            objPool = new List<GameObject>();
-            objQueue = new Queue<GameObject>();
+            objPool = new List<Entity>();
+            objQueue = new Queue<Entity>();
             compAlloc = new ComponentAllocator();
+        }
+
+        public void Reset(){
+            objPool.Clear();
+            objQueue.Clear();
+            compAlloc.Reset();
         }
 
         /// <summary>
@@ -36,27 +42,26 @@ namespace CybrEngine {
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
             compAlloc.Draw(spriteBatch);
-            for (int i = 0; i < objPool.Count; i++) {
-                GameObject obj = objPool[i];
-                if (obj is Entity){
-                    obj.SendMessage("_Draw", new object[]{spriteBatch});
+
+            #if DEBUG
+                for (int i = 0; i < objPool.Count; i++) {
+                    Entity obj = objPool[i];
+                    if (obj is Entity){
+                        obj.SendMessage("_Draw", new object[]{spriteBatch});
+                    }
                 }
-            }
+            #endif
         }
 
         /// <summary>
         /// Called every frame tick by CybrGame
         /// </summary>
         public void Update() {
-            //Instantiate all Entites queued from last update
-            AddInstantiatedObjects();
-
             compAlloc.Update();
             for(int i = 0; i < objPool.Count; i++) {
                 var obj = objPool[i];
                 if(obj.IsDestroyed) {
                     //Remove Entity, and Destory ComponentList
-                    obj.SendMessage("_Cleanup");
                     objPool.Remove(obj);
                     compAlloc.RemoveComponents(obj);
                     continue;
@@ -65,13 +70,16 @@ namespace CybrEngine {
                 obj.SendMessage("_Update");
                 compAlloc.Update();
             }
+
+            //Instantiate all Entites queued from last update
+            AddInstantiatedObjects();
         }
 
         /// <summary>
         /// Runs every physics tick. Runs FixedUpate all on Entity
         /// </summary>
         public void FixedUpdate() {
-            var ents = objPool.FindAll(e => e is GameObject);
+            var ents = objPool.FindAll(e => e is Entity);
             for(int i = 0; i < ents.Count; i++) {
                 var e1 = ents[i];
 
@@ -80,8 +88,8 @@ namespace CybrEngine {
                     e1.SendMessage("_FixedUpdate");
 
                     //Update Position based on Velocity
-                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.deltaTime,
-                                             e1.Transform.Position.Y - e1.Velocity.Y * Time.deltaTime);
+                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.timeScale,
+                                             e1.Transform.Position.Y - e1.Velocity.Y * Time.timeScale);
 
                     //Check all Entity for collision
                     for(int j = 0; j < ents.Count; j++) {
@@ -105,6 +113,7 @@ namespace CybrEngine {
                 var obj = objQueue.Dequeue();
                 objPool.Add(obj);
                 obj.SendMessage("_Start");
+                obj.SetActive(true);
             }
         }
 
@@ -114,17 +123,12 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="position"></param>
         /// <returns></returns>
-        public T Instantiate<T>(Vector2 position) where T : GameObject {
+        public T Instantiate<T>(Vector2 position) where T : Entity {
             var type = typeof(T);
-            GameObject newObject = null;
-            if (typeof(GameObject).IsAssignableFrom(typeof(T))){
-                newObject = GameObject.GameObjectFactory<T>.Construct(this);
+            Entity newObject = null;
+            if (typeof(Entity).IsAssignableFrom(typeof(T))){
+                newObject = Entity.GameObjectFactory<T>.Construct(this);
                 newObject.Transform.Position = position;
-
-                if (newObject is Entity){
-                    var e = newObject as Entity;
-                    e.AddComponent<Sprite>();
-                }
 
                 newObject.SendMessage("_Awake");
                 objQueue.Enqueue(newObject);
@@ -133,15 +137,15 @@ namespace CybrEngine {
             throw new Exception("No Object of type " + typeof(T));
         }
 
-        public T GetObjectOfType<T>() where T : GameObject{
+        public T GetObjectOfType<T>() where T : Entity{
             return (T)objPool.Find(e => e is T);
         }
 
-        public List<GameObject> GetObjectsOfType<T>() where T : GameObject{
+        public List<Entity> GetObjectsOfType<T>() where T : Entity{
             return objPool.FindAll(e => e is T);
         }
 
-        public GameObject AddInstance(GameObject gameObject){
+        public Entity AddInstance(Entity gameObject){
             gameObject.SendMessage("_Awake");
             objQueue.Enqueue(gameObject);
             return gameObject;
@@ -153,7 +157,7 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T AddComponent<T>(GameObject entity) where T : Component {
+        public T AddComponent<T>(Entity entity) where T : Component {
             return compAlloc.AddComponent<T>(entity);
         }
 
@@ -163,11 +167,11 @@ namespace CybrEngine {
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T GetComponent<T>(GameObject id) where T : Component {
+        public T GetComponent<T>(Entity id) where T : Component {
             return compAlloc.GetComponent<T>(id);
         }
 
-        public List<T> GetComponents<T>(GameObject id) where T : Component {
+        public List<T> GetComponents<T>(Entity id) where T : Component {
             return compAlloc.GetComponents<T>(id);
         }
 

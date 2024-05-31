@@ -35,7 +35,7 @@ namespace CybrEngine {
             return instance;
         }
 
-        public static T GameObject<T>() where T : GameObject {
+        public static T GameObject<T>() where T : Entity {
             T entity = (T)Activator.CreateInstance(typeof(T), true);
             return entity;
         }

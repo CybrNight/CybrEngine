@@ -10,16 +10,17 @@ namespace CybrEngine {
         public static float fixedUpdateAlpha;
         public static float fixedUpdateMult = 0;
         public static float elapsedTime;
-        public static float deltaTime;
+        public static float deltaTime = 0;
         public static float fixedDeltaTime;
         public static float fixedTime;
         public static float frameTime;
+        public static float timeScale = 0f;
         public static TimeSpan fixedUpdateRate;
 
         public static List<Timer> alarms = new List<Timer>();
 
         public static void Update(ref GameTime gameTime) {
-            deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
@@ -32,7 +33,7 @@ namespace CybrEngine {
         }
 
         public static void FixedUpdate(ref GameTime gameTime) {
-            fixedDeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //fixedDeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
     }
 }
