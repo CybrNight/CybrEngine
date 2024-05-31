@@ -21,11 +21,6 @@ namespace CybrEngine {
         /// </summary>
         public Rectangle Bounds => Transform.Bounds;
 
-        private void _Cleanup() {
-            Transform = null;
-        }
-
-
         /// <summary>
         /// Returns Transform.Velocity
         /// </summary>

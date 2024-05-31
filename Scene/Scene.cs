@@ -12,5 +12,9 @@ namespace CybrEngine {
         protected T Instantiate<T>(Vector2 position = new Vector2()) where T : Entity{
             return ObjectAllocator.Instance.Instantiate<T>(position);
         }
+
+        protected T Instantiate<T>(float x, float y) where T : Entity {
+            return Instantiate<T>(new Vector2(x, y));
+        }
     }
 }

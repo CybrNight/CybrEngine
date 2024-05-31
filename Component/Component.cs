@@ -13,10 +13,6 @@ namespace CybrEngine {
             return component;
         }
 
-        private void _Cleanup() {
-            Entity = null;
-        }
-
         public virtual void Draw(SpriteBatch spriteBatch) { }
 
         /// <summary>

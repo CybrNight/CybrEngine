@@ -62,7 +62,6 @@ namespace CybrEngine {
                 var obj = objPool[i];
                 if(obj.IsDestroyed) {
                     //Remove Entity, and Destory ComponentList
-                    obj.SendMessage("_Cleanup");
                     objPool.Remove(obj);
                     compAlloc.RemoveComponents(obj);
                     continue;
@@ -89,8 +88,8 @@ namespace CybrEngine {
                     e1.SendMessage("_FixedUpdate");
 
                     //Update Position based on Velocity
-                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.deltaTime,
-                                             e1.Transform.Position.Y - e1.Velocity.Y * Time.deltaTime);
+                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * 0.5f,
+                                             e1.Transform.Position.Y - e1.Velocity.Y * 0.5f);
 
                     //Check all Entity for collision
                     for(int j = 0; j < ents.Count; j++) {
@@ -129,11 +128,6 @@ namespace CybrEngine {
             if (typeof(Entity).IsAssignableFrom(typeof(T))){
                 newObject = Entity.GameObjectFactory<T>.Construct(this);
                 newObject.Transform.Position = position;
-
-                if (newObject is Entity){
-                    var e = newObject as Entity;
-                    e.AddComponent<Sprite>();
-                }
 
                 newObject.SendMessage("_Awake");
                 newObject.SetActive(true);
