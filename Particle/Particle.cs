@@ -15,6 +15,7 @@ namespace CybrEngine {
         public float Life { get; set; } = 1.0f;
 
         public abstract void Draw(SpriteBatch spriteBatch);
+        public virtual void Update(){ }
 
         public override bool Equals(object obj) {
             return obj is Particle particle &&

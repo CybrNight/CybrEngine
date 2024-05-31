@@ -4,13 +4,14 @@ namespace CybrEngine {
     public class Transform {
         private Rectangle _bounds;
 
-        public Vector2 Origin { get; set; }
+        public Vector2 LocalOrigin{  get; set; }
+        public Vector2 Origin { get { return new Vector2(Bounds.Width / 2, Bounds.Height / 2); } }
 
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
         public Vector2 Scale { get; set; }
         public Rectangle Bounds {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, 32*(int)Scale.X, (int)Scale.Y*32); }
+            get { return new Rectangle((int)Position.X, (int)Position.Y, (int)(32*Scale.X), (int)(32*Scale.Y)); }
 
         }
 
@@ -26,7 +27,7 @@ namespace CybrEngine {
 
         public Transform(Vector2 position) {
             Position = position;
-            Origin = new Vector2(Bounds.Width / 2, Bounds.Height / 2);
+            //Origin = new Vector2(Bounds.Width / 2, Bounds.Height / 2);
             Scale = Vector2.One;
 
             Velocity = Vector2.Zero;

@@ -7,7 +7,7 @@ namespace CybrEngine {
     /// <summary>
     /// Static wrapper class to expose InputHandler
     /// </summary>
-    public static class Input {
+    public static class Input{
 
         private static InputHandler _inputHandler;
 
@@ -35,9 +35,15 @@ namespace CybrEngine {
         public static float GetAxis(string axis) {
             return _inputHandler.GetAxis(axis);
         }
+
+  
     }
 
-    internal class InputHandler : IMessageable {
+    internal class InputHandler : IResettable {
+        public void Reset() {
+            pressedKeys.Clear();
+        }
+
         private static InputHandler _instance;
         public static InputHandler Instance {
             get {
@@ -126,5 +132,6 @@ namespace CybrEngine {
 
             return (pressedKeys[key] > 0 && pressedKeys[key] < 0.25);
         }
+
     }
 }

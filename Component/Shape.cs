@@ -2,22 +2,22 @@
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CybrEngine {
-    public class Sprite : Component {
+    public class Shape : Component {
 
-        private Sprite() {
-            Name = "Sprite";
+        private Shape() {
+            Name = "Shape";
             SetTexture(Assets.GetTexture("blank"));
         }
 
         public Vector2 Scale { get; set; } = Vector2.One;
         public Vector2 Offset { get; set; } = Vector2.Zero;
-        public Texture2D Texture { get; private set; }
+        public Texture2D ShapeTex { get; private set; }
         public Color Color { get; set; } = Color.White;
 
-        public Rectangle Bounds => Texture.Bounds;
+        public Rectangle Bounds => ShapeTex.Bounds;
 
         public void SetTexture(Texture2D texture) {
-            Texture = texture;
+            ShapeTex = texture;
         }
 
         /// <summary>
@@ -25,12 +25,12 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch){
-            if(Texture == null) return;
+            if(ShapeTex == null) return;
 
             var transform = Entity.Transform;
-            spriteBatch.Draw(Texture, transform.Position, transform.Bounds, Color, 0f,
+            spriteBatch.Draw(ShapeTex, transform.Position, null, Color, 0f,
             transform.Origin,
-            Vector2.One,
+            transform.Scale,
             SpriteEffects.None,
             0f);
         }
