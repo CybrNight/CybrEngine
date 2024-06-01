@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Text.Json.Serialization;
 
@@ -162,7 +163,7 @@ namespace CybrEngine {
                 ContentLoaded = game.LoadContent();
                 if(ContentLoaded) {
                     GameInitialized = game.GameInit();
-                    GameRunning = game.GameStart();
+                    game.GameStart();
                 }
             }
         }
@@ -189,33 +190,32 @@ namespace CybrEngine {
         protected override void Update(GameTime gameTime) {
             Time.gameTime = gameTime;
             if(GameInitialized) {
+                Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
                 _game.GameUpdate();
                 inputHandler.Update();
-
-
-                Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                
-                if (Time.timeScale == 0.75f){
-                    particleHandler.Update();
-                    objAlloc.Update();
-                }
                 GameRunning = true;
                 // Calculate elapsed time since last frame
                 TimeSpan currentGameTime = gameTime.TotalGameTime;
-                float elapsedTime = (float)(currentGameTime - _previousGameTime).TotalSeconds;
+                float elapsedTime = (float)(currentGameTime - _previousGameTime).TotalSeconds * (Time.timeScale);
                 _previousGameTime = currentGameTime;
 
                 // Accumulate elapsed time
                 _accumulatedTime += elapsedTime;
+
+                if (elapsedTime > 0) {
+                    Debug.WriteLine(elapsedTime);
+                    Debug.WriteLine(Time.deltaTime);
+                    particleHandler.Update();
+                    objAlloc.Update();
+                }
 
                 // Fixed update loop
                 while(_accumulatedTime >= FixedTimeStep) {
                     FixedUpdate();
                     _accumulatedTime -= FixedTimeStep;
                 }
-            } else {
-                Time.timeScale = 0;
-                Time.deltaTime = 0;
             }
             base.Update(gameTime);
 

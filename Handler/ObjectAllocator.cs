@@ -88,8 +88,8 @@ namespace CybrEngine {
                     e1.SendMessage("_FixedUpdate");
 
                     //Update Position based on Velocity
-                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X * Time.timeScale,
-                                             e1.Transform.Position.Y - e1.Velocity.Y * Time.timeScale);
+                    e1.Transform.Position = new Vector2(e1.Transform.Position.X + e1.Velocity.X,
+                                             e1.Transform.Position.Y - e1.Velocity.Y);
 
                     //Check all Entity for collision
                     for(int j = 0; j < ents.Count; j++) {
