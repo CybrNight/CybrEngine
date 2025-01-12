@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace CybrEngine {
     /// <summary>
@@ -65,6 +66,8 @@ namespace CybrEngine {
 
         private readonly int DEFAULT_FIXED_UPDATE_RATE = Config.FIXED_UPDATE_FPS;
 
+        private Thread thread;
+
         private Engine() {
             graphics = new GraphicsDeviceManager(this);
 
@@ -93,7 +96,11 @@ namespace CybrEngine {
         }
 
         public void StartGame() {
-
+            ContentLoaded = _game.LoadContent();
+            if(ContentLoaded) {
+                GameInitialized = _game.GameInit();
+                GameRunning = _game.GameStart();
+            }
         }
 
         public void LoadGame(CybrGame game) {
@@ -145,11 +152,8 @@ namespace CybrEngine {
 
 
             if(_game != null) {
-                ContentLoaded = _game.LoadContent();
-                if(ContentLoaded) {
-                    GameInitialized = _game.GameInit();
-                    GameRunning = _game.GameStart();
-                }
+                thread = new Thread(StartGame);
+                thread.Start();
             }
         }
 
@@ -183,7 +187,7 @@ namespace CybrEngine {
         private float previousT = 0;
         private float accumulator = 0.0f;
         private float maxFrameTime = 10;
-        private const float FixedTimeStep = 1f / 90f; // 60 updates per second
+        private const float FixedTimeStep = 1f / 60f; // 60 updates per second
         private float _accumulatedTime;
         private TimeSpan _previousGameTime;
 
@@ -205,8 +209,6 @@ namespace CybrEngine {
                 _accumulatedTime += elapsedTime;
 
                 if (elapsedTime > 0) {
-                    Debug.WriteLine(elapsedTime);
-                    Debug.WriteLine(Time.deltaTime);
                     particleHandler.Update();
                     objAlloc.Update();
                 }
@@ -216,11 +218,10 @@ namespace CybrEngine {
                     FixedUpdate();
                     _accumulatedTime -= FixedTimeStep;
                 }
+                
             }
+            thread.Join(1);
             base.Update(gameTime);
-
-
-
         }
 
 

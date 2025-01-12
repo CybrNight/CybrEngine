@@ -20,6 +20,12 @@ namespace CybrEngine {
             return default(T);
         }
 
+        /// <summary>
+        /// Constructs a MethodInfo object
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static MethodInfo MethodCall(object instance, string name) {
             // Get the type of MyClass
             Type type = instance.GetType();

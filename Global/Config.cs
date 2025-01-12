@@ -52,7 +52,7 @@ namespace CybrEngine {
         public static float SPRITE_COLLISION_OFFSET { get; set; } = 0f;
 
         public static float TIME_OFFSE { get; set; } = 0.1f;
-        public static int FIXED_UPDATE_FPS { get; set; } = 60;
+        public static int FIXED_UPDATE_FPS { get; set; } = 30;
         public static int PIVOT_RADIUS { get; set; } = 10;
 
         public static int CAMERA_TIME_MULTIPLIER { get; set; } = 1; // set this and CAMERA_FOLLOW_DELAY to a higher value to create a "wabbly" camera

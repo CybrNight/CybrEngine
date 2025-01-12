@@ -11,12 +11,14 @@ namespace CybrEngine {
         public static InputHandler inputHandler;
         public static ParticleHandler particleHandler;
         public static SceneManager sceneManager;
+        public static PhysicsHandler physicsHandler;
 
         public static void Reset(){
             objAllocator.Reset();
             inputHandler.Reset();
             particleHandler.Reset();
             sceneManager.Reset();
+            physicsHandler.Reset();
         }
 
         static Autoload(){

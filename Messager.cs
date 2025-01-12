@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -7,6 +8,23 @@ namespace CybrEngine {
     public static class MesssageExtensions {
         public static void SendMessage(this IMessageable obj, string message) {
             Messager.SendMessage(obj, message);
+        }
+
+        public static void SendMessage(this IMessageable obj, string message, SpriteBatch spriteBatch){
+            obj.SendMessage(message, new object[]{ spriteBatch });
+        }
+
+        public static void SendMessage(this IMessageable obj, string message, float value){
+            obj.SendMessage(message, new object[] { value });
+        }
+
+        // Allows to pass IMesssageable object to other IMessaeable
+        public static void SendMessage(this IMessageable obj, string message, IMessageable other){
+            obj.SendMessage(message, new object[]{other});
+        }
+
+        public static void SendMessage(this IMessageable obj, string message, Entity other){
+            obj.SendMessage(message, new object[] { other });
         }
 
         public static void SendMessage(this IMessageable obj, string message, params object[] args) {
@@ -39,7 +57,7 @@ namespace CybrEngine {
                 InvokeMethod(instance, name);
             }else{
                 var cache = msgCache[instance];
-                if(cache.ContainsKey(name)) {
+                if(cache.ContainsKey(name)) { // Check if this Message has been sent before
                     var method = cache[name];
                     try {
                         method.Invoke(instance, paramVals);
@@ -48,6 +66,7 @@ namespace CybrEngine {
                         throw new MessageException();
                     }
                 } else {
+                    // Save method call to instance Message cache
                     var method = Builder.MethodCall(instance, name);
                     if(method != null) {
                         msgCache[instance].Add(name, method);

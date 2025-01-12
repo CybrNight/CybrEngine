@@ -43,11 +43,11 @@ namespace CybrEngine {
         }
 
         //Handles retrieving Componenet from Entity
-        public T GetComponent<T>() where T : Component {
+        public Component GetComponent<T>() {
             return objAlloc.GetComponent<T>(this);
         }
 
-        public List<T> GetComponents<T>() where T : Component {
+        public List<Component> GetComponents<T>() where T : Component {
             return objAlloc.GetComponents<T>(this);
         }
 

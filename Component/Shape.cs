@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CybrEngine {
-    public class Shape : Component {
+    public class Shape : Component, IDrawable {
 
         private Shape() {
             Name = "Shape";
