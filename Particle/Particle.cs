@@ -7,15 +7,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public abstract class Particle : Object{
-        
+    public abstract class Particle : Object {
+
         public Transform Transform { get; set; } = new Transform();
+        public Texture2D Texture { get; private set; }
         public Rectangle Bounds { get; set; } = Rectangle.Empty;
         public Color Color { get; set; } = Color.White;
         public float Life { get; set; } = 1.0f;
 
         public abstract void Draw(SpriteBatch spriteBatch);
-        public virtual void Update(){ }
+        public virtual void Update() { }
+
+        private void _Awake() {
+
+        }
+
+        /// <summary>
+        /// Sets Particle Texture to one from Assets based on name
+        /// </summary>
+        /// <param name="name"></param>
+        public void SetTexture(string name) {
+            Texture = Assets.GetTexture(name);
+        }
 
         public override bool Equals(object obj) {
             return obj is Particle particle &&
@@ -35,7 +48,7 @@ namespace CybrEngine {
             return EqualityComparer<Particle>.Default.Equals(left, right);
         }
 
-        public static bool operator !=(Particle left,Particle right) {
+        public static bool operator !=(Particle left, Particle right) {
             return !(left == right);
         }
 
