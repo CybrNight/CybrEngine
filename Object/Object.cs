@@ -13,8 +13,8 @@ namespace CybrEngine {
             public static T Construct(Type[] paramTypes, object[] paramVals) {
                 var obj = Builder.Construct<T>(paramTypes, paramVals);
 
-                obj.objAlloc = Autoload.objAllocator;
-                obj.particleHandler= Autoload.particleHandler;
+                obj.ObjectAllocator = Autoload.ObjectAllocator;
+                obj.ParticleHandler = Autoload.ParticleHandler;
                 obj.Name = obj.GetType().ToString();
 
                 return obj;
@@ -49,8 +49,8 @@ namespace CybrEngine {
 
         public void SetActive(bool value = true) { Active = value; }
 
-        internal ObjectAllocator objAlloc;
-        protected ParticleHandler particleHandler;
+        internal ObjectAllocator ObjectAllocator { get; set;  }
+        protected ParticleStore ParticleHandler { get; set; }
 
         /// <summary>
         /// Marks Object for destruction

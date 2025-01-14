@@ -27,7 +27,6 @@ namespace CybrEngine {
         private ObjectAllocator() {
             objPool = new List<Entity>();
             objQueue = new Queue<Entity>();
-            compAlloc = new ComponentAllocator();
         }
 
         public void Reset(){
@@ -41,8 +40,6 @@ namespace CybrEngine {
         /// </summary>
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
-            compAlloc.Draw(spriteBatch);
-
             #if DEBUG
                 for (int i = 0; i < objPool.Count; i++) {
                     Entity obj = objPool[i];
@@ -57,7 +54,6 @@ namespace CybrEngine {
         /// Called every frame tick by CybrGame
         /// </summary>
         public void Update() {
-            compAlloc.Update();
             for(int i = 0; i < objPool.Count; i++) {
                 var obj = objPool[i];
                 if(obj.IsDestroyed) {
@@ -68,7 +64,6 @@ namespace CybrEngine {
                 }
 
                 obj.SendMessage("_Update");
-                compAlloc.Update();
             }
 
             //Instantiate all Entites queued from last update
@@ -127,7 +122,7 @@ namespace CybrEngine {
             var type = typeof(T);
             Entity newObject = null;
             if (typeof(Entity).IsAssignableFrom(typeof(T))){
-                newObject = Entity.GameObjectFactory<T>.Construct(this);
+                newObject = Entity.EntityFactory<T>.Construct(this);
                 newObject.Transform.Position = position;
 
                 newObject.SendMessage("_Awake");

@@ -8,6 +8,7 @@ namespace CybrEngine {
         public Transform Transform { get; private set; }
         public int sortingLayer = 0;
         protected Entity() { Transform = new Transform(); }
+        internal ComponentAllocator ComponentAllocator { get; set; }
 
         /// <summary>
         /// Get Position of Entity Transform
@@ -39,16 +40,16 @@ namespace CybrEngine {
 
         //Adds new Component to Entity
         public T AddComponent<T>() where T : Component {
-            return objAlloc.AddComponent<T>(this);
+            return ComponentAllocator.AddComponent<T>(this);
         }
 
         //Handles retrieving Componenet from Entity
         public Component GetComponent<T>() {
-            return objAlloc.GetComponent<T>(this);
+            return ComponentAllocator.GetComponent<T>(this);
         }
 
         public List<Component> GetComponents<T>() where T : Component {
-            return objAlloc.GetComponents<T>(this);
+            return ComponentAllocator.GetComponents<T>(this);
         }
 
         public override bool Equals(object obj) {
@@ -70,12 +71,12 @@ namespace CybrEngine {
 
         public Particle EmitParticle(Particle particle, Transform transform) {
             var p = particle.Instance();
-            p.Bounds = transform.Bounds;
-            return particleHandler.Emit(p, p.Transform.Position);
+            p.Bounds = Bounds;
+            return ParticleHandler.Emit(p, p.Transform.Position);
         }
 
         public Particle EmitParticle(Particle particle, Vector2 position) {
-            return particleHandler.Emit(particle.Instance(), position);
+            return ParticleHandler.Emit(particle.Instance(), position);
         }
 
         public T Instantiate<T>() where T : Entity {
@@ -83,11 +84,11 @@ namespace CybrEngine {
         }
 
         public T Instantiate<T>(Vector2 position) where T : Entity {
-            return objAlloc.Instantiate<T>(position);
+            return ObjectAllocator.Instantiate<T>(position);
         }
 
         public T FindObjectOfType<T>() where T : Entity {
-            return objAlloc.GetObjectOfType<T>();
+            return ObjectAllocator.GetObjectOfType<T>();
         }
 
         public static implicit operator bool(Entity e) {
