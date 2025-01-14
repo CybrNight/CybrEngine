@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using System.Threading;
 
@@ -55,7 +56,7 @@ namespace CybrEngine {
         private ObjectAllocator objAlloc;
         private InputHandler inputHandler;
 
-        private ParticleHandler particleHandler;
+        private ParticleStore particleHandler;
 
         private bool GameInitialized { get; set; } = false;
         private bool GameRunning { get; set; } = false;
@@ -88,9 +89,9 @@ namespace CybrEngine {
             Assets.Content = Content;
             Assets.GraphicsDevice = GraphicsDevice;
 
-            objAlloc = Autoload.objAllocator;
-            particleHandler = Autoload.particleHandler;
-            inputHandler = Autoload.inputHandler;
+            objAlloc = Autoload.ObjectAllocator;
+            particleHandler = Autoload.ParticleHandler;
+            inputHandler = Autoload.InputHandler;
 
             //Initialize singleton handlers
         }
@@ -209,7 +210,7 @@ namespace CybrEngine {
                 _accumulatedTime += elapsedTime;
 
                 if (elapsedTime > 0) {
-                    particleHandler.Update();
+                    ComponentAllocator.Instance.Update();
                     objAlloc.Update();
                 }
 
@@ -247,11 +248,11 @@ namespace CybrEngine {
             if(GameInitialized) {
                 GraphicsDevice.Clear(Config.BACKGROUND_COLOR);
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-                particleHandler.Draw(spriteBatch);
                 spriteBatch.End();
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
                 objAlloc.Draw(spriteBatch);
+                ComponentAllocator.Instance.Draw(spriteBatch);
 
                 _game.DebugDraw(spriteBatch);
                 spriteBatch.End();

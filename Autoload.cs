@@ -7,25 +7,27 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     internal static class Autoload{
 
-        public static ObjectAllocator objAllocator;
-        public static InputHandler inputHandler;
-        public static ParticleHandler particleHandler;
-        public static SceneManager sceneManager;
-        public static PhysicsHandler physicsHandler;
+        public static ObjectAllocator ObjectAllocator;
+        public static ComponentAllocator ComponentAllocator;
+        public static InputHandler InputHandler;
+        public static ParticleStore ParticleHandler;
+        public static SceneManager SceneManager;
+        public static PhysicsHandler PhysicsHandler;
 
         public static void Reset(){
-            objAllocator.Reset();
-            inputHandler.Reset();
-            particleHandler.Reset();
-            sceneManager.Reset();
-            physicsHandler.Reset();
+            ObjectAllocator.Reset();
+            InputHandler.Reset();
+            ParticleHandler.Reset();
+            SceneManager.Reset();
+            PhysicsHandler.Reset();
         }
 
         static Autoload(){
-            objAllocator = ObjectAllocator.Instance;
-            inputHandler = InputHandler.Instance;
-            particleHandler = ParticleHandler.Instance; 
-            sceneManager = SceneManager.Instance;
+            ObjectAllocator = ObjectAllocator.Instance;
+            ComponentAllocator = ComponentAllocator.Instance;
+            InputHandler = InputHandler.Instance;
+            ParticleHandler = ParticleStore.Instance; 
+            SceneManager = SceneManager.Instance;
         }
     }
 }

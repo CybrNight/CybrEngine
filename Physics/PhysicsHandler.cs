@@ -16,7 +16,7 @@ internal class PhysicsHandler : IResettable {
         /// Runs every physics tick. Runs FixedUpate all on Entity
         /// </summary>
         public void FixedUpdate() {
-            var ents = Autoload.objAllocator.GetAll();
+            var ents = Autoload.ObjectAllocator.GetAll();
             for(int i = 0; i < ents.Count; i++) {
                 var e1 = ents[i];
 

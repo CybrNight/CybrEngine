@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    internal interface IDrawable {
+    public interface IDrawable {
 
         public abstract void Draw(SpriteBatch spriteBatch);
     }

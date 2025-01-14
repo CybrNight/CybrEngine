@@ -255,6 +255,7 @@ namespace CybrEngine {
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, Entity> objects = new Dictionary<string, Entity>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
+        private static Dictionary<string, Particle> particles = new Dictionary<string, Particle>();
 
         public static ContentManager Content;
         public static GraphicsDevice GraphicsDevice;
@@ -292,6 +293,18 @@ namespace CybrEngine {
             Texture2D sprite = Content.Load<Texture2D>(path);
             textures.Add(name, sprite);
             return sprite;
+        }
+
+        public static void AddParticleFromFile(string name, string path){
+
+        }
+
+        public static void AddParticle(string name, Particle particle){
+            particles[name] = particle;
+        }
+
+        public static Particle GetParticle(string name) { 
+            return particles[name];
         }
 
         public static void DisposeTexture(string name) {

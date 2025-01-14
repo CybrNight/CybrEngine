@@ -19,7 +19,17 @@ namespace CybrEngine {
             return cMap[key];
         }
 
-        public ComponentAllocator() {
+        private static ComponentAllocator _instance;
+        public static ComponentAllocator Instance {
+            get {
+                if(_instance == null) {
+                    _instance = new ComponentAllocator();
+                }
+                return _instance;
+            }
+        }
+
+        private ComponentAllocator() {
             cMap = new Dictionary<Entity, List<Component>>();
             cTypeMap = new Dictionary<Type, List<Component>>();
         }
@@ -28,7 +38,21 @@ namespace CybrEngine {
         /// Update all 
         /// </summary>
         public void Update(){
-            
+            var startSize = cMap.Count;
+            foreach(var cList in cMap.Values) {
+                var innerSize = cList.Count;
+                foreach(var c in cList) {
+                    c.Update();
+
+                    if(innerSize != cList.Count) {
+                        return;
+                    }
+                }
+
+                if(startSize != cMap.Count) {
+                    return;
+                }
+            }
         }
 
         /// <summary>
@@ -74,16 +98,14 @@ namespace CybrEngine {
         /// <returns></returns>
         public T AddComponent<T>(Entity entity) where T : Component  {
             var component = Component.Create<T>(entity);
-            var cType = component.GetType();
 
             //Initialize entries for both caches
             if(!cMap.ContainsKey(entity)) {
                 cMap[entity] = new List<Component>();
-                cTypeMap[cType] = new List<Component>();
             }
 
             cMap[entity].Add(component);
-            cTypeMap[cType].Add(component);
+            component.SendMessage("_Awake");
             return component;
         }
 

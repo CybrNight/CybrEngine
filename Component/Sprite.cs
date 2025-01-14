@@ -6,7 +6,7 @@ namespace CybrEngine {
 
         private Sprite() {
             Name = "Sprite";
-            SetTexture(Assets.GetTexture("blank"));
+            SetTexture("blank");
         }
 
         public Vector2 Scale { get; set; } = Vector2.One;
@@ -16,8 +16,8 @@ namespace CybrEngine {
 
         public Rectangle Bounds => Texture.Bounds;
 
-        public void SetTexture(Texture2D texture) {
-            Texture = texture;
+        public void SetTexture(string name) {
+            Texture = Assets.GetTexture(name);
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace CybrEngine {
         private static T Instance<T>(this T instance) where T : Object{
             var clone = Object.Factory<T>.Instance(instance); 
             if (clone is Entity){
-                Autoload.objAllocator.AddInstance(clone as Entity);
+                Autoload.ObjectAllocator.AddInstance(clone as Entity);
             }
             return clone;
         }

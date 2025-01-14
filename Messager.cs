@@ -54,7 +54,7 @@ namespace CybrEngine {
             //If first time messaging this instance, add new cache for it, and return
             if(!msgCache.ContainsKey(instance)) {
                 msgCache[instance] = new Dictionary<string, MethodInfo>();
-                InvokeMethod(instance, name);
+                SendMessage(instance, name, paramVals);
             }else{
                 var cache = msgCache[instance];
                 if(cache.ContainsKey(name)) { // Check if this Message has been sent before
