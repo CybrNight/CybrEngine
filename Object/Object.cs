@@ -30,8 +30,11 @@ namespace CybrEngine {
             /// </summary>
             /// <returns></returns>
             public static T Instance(Object obj) {
-                var clone = obj.MemberwiseClone() as T;
-                return clone;
+                if (obj){
+                    var clone = obj.MemberwiseClone() as T;
+                    return clone;
+                }
+                return default(T);
             }
         }
 
@@ -81,6 +84,10 @@ namespace CybrEngine {
 
         public T Instantiate<T>() where T : Object {
             return Builder.Construct<T>();
+        }
+
+        public static implicit operator bool(Object e) {
+            return (e != default);
         }
 
         public static bool operator ==(Object left, Object right) {

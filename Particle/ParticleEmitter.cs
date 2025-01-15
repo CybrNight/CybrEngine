@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,16 @@ namespace CybrEngine{
         }
 
         public void SetParticle(string name, Color color){
-            Particle = Assets.GetParticle(name); 
-            Particle.Color = color;
+            Particle = Assets.GetParticle(name);
+            if(Particle) {
+                Particle.Color = color;
+            }
+        }
+
+        public void SetTexture(string name){
+            if(Particle) {
+                Particle.SetTexture(name);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
@@ -44,10 +53,13 @@ namespace CybrEngine{
 
         public void Emit(){
             var p = Particle.Instance();
-            p.Bounds = Entity.Bounds;
-            p.Transform.Position = Entity.Position;
-            p.Bounds = Entity.Bounds;
-            particles.Add(p);
+
+            if(p) {
+                p.Bounds = Entity.Bounds;
+                p.Transform.Position = Entity.Position;
+                p.Bounds = Entity.Bounds;
+                particles.Add(p);
+            }
         }
 
         public Particle Emit(Particle particle, Vector2 position) {

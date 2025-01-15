@@ -310,8 +310,9 @@ namespace CybrEngine {
         
         }
 
-        public static void AddParticle(string name, Particle particle){
+        public static void AddParticle(string name, string path, Particle particle){
             if (particle != default){
+                particle.SetTexture(path);
                 particles[name] = particle;
             }
         }
@@ -320,7 +321,7 @@ namespace CybrEngine {
             if (particles.ContainsKey(name)){
                 return particles[name].Clone() as Particle;
             }
-            return null;
+            return default;
         }
 
         public static void DisposeTexture(string name) {

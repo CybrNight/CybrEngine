@@ -40,9 +40,6 @@ namespace CybrEngine {
             return HashCode.Combine(base.GetHashCode(), ID);
         }
 
-        public static implicit operator bool(Particle e) {
-            return (e != null);
-        }
 
         public static bool operator ==(Particle left, Particle right) {
             return EqualityComparer<Particle>.Default.Equals(left, right);
