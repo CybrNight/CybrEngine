@@ -7,7 +7,6 @@ namespace CybrEngine {
     public abstract partial class Entity : Object {
         public Transform Transform { get; private set; }
         public int sortingLayer = 0;
-        protected Entity() { Transform = new Transform(); }
         internal ComponentAllocator ComponentAllocator { get; set; }
 
         /// <summary>

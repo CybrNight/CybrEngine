@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CybrEngine {
-    public abstract class Particle : Object {
+    public abstract partial class Particle : Object {
 
         public Transform Transform { get; set; } = new Transform();
         public Texture2D Texture { get; private set; }
@@ -15,7 +15,7 @@ namespace CybrEngine {
         public Color Color { get; set; } = Color.White;
         public float Life { get; set; } = 1.0f;
 
-        public abstract void Draw(SpriteBatch spriteBatch);
+        public virtual void Draw(SpriteBatch spriteBatch){ }
         public virtual void Update() { }
 
         private void _Awake() {

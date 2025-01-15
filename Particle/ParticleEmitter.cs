@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CybrEngine{
     public class ParticleEmitter : Component, IDrawable{
-
+        
         public Particle Particle {  get; private set; }
 
         private List<Particle> particles = new List<Particle>();
@@ -26,7 +26,7 @@ namespace CybrEngine{
             for(int i = 0; i < particles.Count; i++) {
                 var particle = particles[i];
                 if(!particle.IsDestroyed) {
-                    particle.Draw(spriteBatch);
+                    spriteBatch.Draw(particle.Texture, particle.Bounds, null, particle.Color, 0f, Entity.Transform.Origin, SpriteEffects.None, 1.0f);
                 }
             }
         }

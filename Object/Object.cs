@@ -13,6 +13,7 @@ namespace CybrEngine {
             public static T Construct(Type[] paramTypes, object[] paramVals) {
                 var obj = Builder.Construct<T>(paramTypes, paramVals);
 
+                obj.ID = GLOBAL_ID++;
                 obj.ObjectAllocator = Autoload.ObjectAllocator;
                 obj.ParticleHandler = Autoload.ParticleHandler;
                 obj.Name = obj.GetType().ToString();
@@ -41,8 +42,8 @@ namespace CybrEngine {
         public bool IsCreated { get; private set; } = false;
         protected bool Destroyed { get; set; } = false;
         protected bool BeingDestroyed { get; set; } = false;
-        public int ID { get; private set; }
-        private static int GLOBAL_ID { get; set; } = 0;
+        public int ID { get; internal set; }
+        internal static int GLOBAL_ID { get; set; } = 0;
 
         public bool IsActive => Active || IsDestroyed;
         public bool IsDestroyed => BeingDestroyed || Destroyed;
@@ -74,12 +75,8 @@ namespace CybrEngine {
             return HashCode.Combine(ID);
         }
 
-        public void Print(string value){
+        public void Print(string value) {
             Debug.WriteLine(value);
-        }
-
-        public Object() {
-            ID = GLOBAL_ID++;
         }
 
         public T Instantiate<T>() where T : Object {

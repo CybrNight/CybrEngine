@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace CybrEngine {
@@ -12,6 +13,7 @@ namespace CybrEngine {
             private static Texture2D _square;
             private static Texture2D _circle;
             private static Texture2D _triangle;
+            private static Texture2D _hexagon;
             private static Texture2D _ring;
 
             public static Texture2D Square{
@@ -278,6 +280,11 @@ namespace CybrEngine {
 
         public static SpriteFont LoadSpriteFont(string name, string path) {
             SpriteFont font = Content.Load<SpriteFont>(path);
+
+            if (font == default){
+                throw new ContentLoadException($"No file at {path} in MGCB");
+            }
+
             fonts.Add(name, font);
             return font;
         }
@@ -286,7 +293,7 @@ namespace CybrEngine {
             if(textures.ContainsKey(name)) {
                 return fonts[name];
             }
-            return null;
+            return default(SpriteFont);
         }
 
         public static Texture2D LoadTexture(string name, string path) {
@@ -299,12 +306,21 @@ namespace CybrEngine {
 
         }
 
+        public static void CreateParticle(string name, string path, Color color){
+        
+        }
+
         public static void AddParticle(string name, Particle particle){
-            particles[name] = particle;
+            if (particle != default){
+                particles[name] = particle;
+            }
         }
 
         public static Particle GetParticle(string name) { 
-            return particles[name];
+            if (particles.ContainsKey(name)){
+                return particles[name].Clone() as Particle;
+            }
+            return null;
         }
 
         public static void DisposeTexture(string name) {

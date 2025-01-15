@@ -5,8 +5,6 @@ namespace CybrEngine {
     public class Sprite : Component, IDrawable {
 
         private Sprite() {
-            Name = "Sprite";
-            SetTexture("blank");
         }
 
         public Vector2 Scale { get; set; } = Vector2.One;

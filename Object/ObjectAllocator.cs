@@ -122,7 +122,7 @@ namespace CybrEngine {
             var type = typeof(T);
             Entity newObject = null;
             if (typeof(Entity).IsAssignableFrom(typeof(T))){
-                newObject = Entity.EntityFactory<T>.Construct(this);
+                newObject = Entity.Construct<T>();
                 newObject.Transform.Position = position;
 
                 newObject.SendMessage("_Awake");
