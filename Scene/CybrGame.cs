@@ -13,7 +13,7 @@ namespace CybrEngine {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
-        private ObjectAllocator objAlloc;
+        private EntityAllocator objAlloc;
 
         public abstract bool LoadContent();
         public abstract bool GameInit();
@@ -34,16 +34,16 @@ namespace CybrEngine {
             return objAlloc.AddInstance(instance);
         }
 
-        public T Instantiate<T>(float x, float y) where T : Entity {
+        public Entity Instantiate<T>(float x, float y) where T : Entity {
             return objAlloc.Instantiate<T>(new Vector2(x, y));
         }
 
-        public T Instantiate<T>(Vector2 position) where T : Entity {
+        public Entity Instantiate<T>(Vector2 position) where T : Entity {
             return objAlloc.Instantiate<T>(position);
         }
 
 
-        public T Instantiate<T>() where T : Entity {
+        public Entity Instantiate<T>() where T : Entity {
             return objAlloc.Instantiate<T>(new Vector2());
         }
 

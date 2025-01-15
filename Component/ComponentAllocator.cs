@@ -9,7 +9,7 @@ namespace CybrEngine {
 
         private Dictionary<Entity, List<Component>> cMap;
         private Dictionary<Type, List<Component>> cTypeMap;
-
+        private Queue<Entity> dQueue;
         /// <summary>
         /// Gets all Components from Entity
         /// </summary>
@@ -32,12 +32,22 @@ namespace CybrEngine {
         private ComponentAllocator() {
             cMap = new Dictionary<Entity, List<Component>>();
             cTypeMap = new Dictionary<Type, List<Component>>();
+             dQueue = new Queue<Entity>();
+
         }
 
         /// <summary>
         /// Update all 
         /// </summary>
         public void Update(){
+            if(dQueue.Count > 0) {
+                while(dQueue.Count > 0) { 
+                    var e = dQueue.Dequeue();
+                    RemoveComponents(e);
+                }
+                return;
+            }
+
             var startSize = cMap.Count;
             foreach(var cList in cMap.Values) {
                 var innerSize = cList.Count;
@@ -77,6 +87,10 @@ namespace CybrEngine {
             }
         }
 
+        public void RemoveEntity(Entity entity) {
+            dQueue.Enqueue(entity);
+        }
+
         public void RemoveComponents(Entity key) {
             if(cMap.ContainsKey(key)) {
                 for(int i = 0; i < cMap[key].Count; i++) {
@@ -84,7 +98,6 @@ namespace CybrEngine {
                     var cType = cMap[key][i].GetType();
 
                     c.Destroy();
-                    cTypeMap[cType].Remove(c);
                 }
                 cMap.Remove(key);
             }
@@ -117,7 +130,7 @@ namespace CybrEngine {
         /// <returns></returns>
         public Component GetComponent<T>(Entity key) {
             if(!cMap.ContainsKey(key)) {
-                return null;
+                return default(Component);
             }
 
             var cList = cMap[key];

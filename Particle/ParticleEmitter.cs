@@ -62,15 +62,6 @@ namespace CybrEngine{
             }
         }
 
-        public Particle Emit(Particle particle, Vector2 position) {
-            var p = particle.Instance();
-            p.Bounds = Entity.Bounds;
-            p.Transform.Position = position;
-            p.Bounds = Entity.Bounds;
-            particles.Add(p);
-            return p;
-        }
-
         public void Reset() {
             particles.Clear();
         }

@@ -53,7 +53,7 @@ namespace CybrEngine {
 
         public void SetActive(bool value = true) { Active = value; }
 
-        internal ObjectAllocator ObjectAllocator { get; set;  }
+        internal EntityAllocator ObjectAllocator { get; set;  }
         protected ParticleStore ParticleHandler { get; set; }
 
         /// <summary>

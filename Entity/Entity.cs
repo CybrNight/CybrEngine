@@ -9,11 +9,14 @@ namespace CybrEngine {
         public int sortingLayer = 0;
         internal ComponentAllocator ComponentAllocator { get; set; }
 
+        public Entity(){ }
+
         /// <summary>
         /// Get Position of Entity Transform
         /// </summary>
         public Vector2 Position {
             get { return Transform.Position; }
+            set { Transform.Position = value; }
         }
 
         /// <summary>
@@ -26,6 +29,7 @@ namespace CybrEngine {
         /// </summary>
         public Vector2 Velocity {
             get { return Transform.Velocity; }
+            set { Transform.Velocity = value; }
         }
 
         /// <summary>
@@ -43,7 +47,7 @@ namespace CybrEngine {
         }
 
         //Handles retrieving Componenet from Entity
-        public Component GetComponent<T>() {
+        public Component GetComponent<T>() where T : Component {
             return ComponentAllocator.GetComponent<T>(this);
         }
 
@@ -78,15 +82,15 @@ namespace CybrEngine {
             return ParticleHandler.Emit(particle.Instance(), position);
         }
 
-        public T Instantiate<T>() where T : Entity {
+        public new Entity Instantiate<T>() where T : Entity {
             return Instantiate<T>(Position);
         }
 
-        public T Instantiate<T>(Vector2 position) where T : Entity {
+        public Entity Instantiate<T>(Vector2 position) where T : Entity {
             return ObjectAllocator.Instantiate<T>(position);
         }
 
-        public T FindObjectOfType<T>() where T : Entity {
+        public T FindEntityOfType<T>() where T : Entity {
             return ObjectAllocator.GetObjectOfType<T>();
         }
 

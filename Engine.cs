@@ -53,7 +53,7 @@ namespace CybrEngine {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private ObjectAllocator objAlloc;
+        private EntityAllocator objAlloc;
         private InputHandler inputHandler;
 
         private ParticleStore particleHandler;

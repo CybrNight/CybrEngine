@@ -7,30 +7,30 @@ using System.ComponentModel;
 using System.Diagnostics;
 
 namespace CybrEngine {
-    internal class ObjectAllocator : IResettable {
-        private static ObjectAllocator _instance;
-        public static ObjectAllocator Instance {
+    internal class EntityAllocator : IResettable {
+        private static EntityAllocator _instance;
+        public static EntityAllocator Instance {
             get {
                 if(_instance == null) {
-                    _instance = new ObjectAllocator();
+                    _instance = new EntityAllocator();
                 }
                 return _instance;
             }
         }
 
-        private List<Entity> objPool;
+        private List<Entity> entityPool;
         private Queue<Entity> objQueue;
 
         private ComponentAllocator compAlloc;
 
 
-        private ObjectAllocator() {
-            objPool = new List<Entity>();
+        private EntityAllocator() {
+            entityPool = new List<Entity>();
             objQueue = new Queue<Entity>();
         }
 
         public void Reset(){
-            objPool.Clear();
+            entityPool.Clear();
             objQueue.Clear();
             compAlloc.Reset();
         }
@@ -41,8 +41,8 @@ namespace CybrEngine {
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch) {
             #if DEBUG
-                for (int i = 0; i < objPool.Count; i++) {
-                    Entity obj = objPool[i];
+                for (int i = 0; i < entityPool.Count; i++) {
+                    Entity obj = entityPool[i];
                     if (obj is Entity){
                         obj.SendMessage("_DebugDraw", spriteBatch);
                     }
@@ -54,16 +54,16 @@ namespace CybrEngine {
         /// Called every frame tick by CybrGame
         /// </summary>
         public void Update() {
-            for(int i = 0; i < objPool.Count; i++) {
-                var obj = objPool[i];
-                if(obj.IsDestroyed) {
+            for(int i = 0; i < entityPool.Count; i++) {
+                var entity = entityPool[i];
+                if(entity.IsDestroyed) {
                     //Remove Entity, and Destory ComponentList
-                    objPool.Remove(obj);
-                    compAlloc.RemoveComponents(obj);
+                    Autoload.ComponentAllocator.RemoveEntity(entity);
+                    entityPool.Remove(entity);
                     continue;
                 }
 
-                obj.SendMessage("_Update");
+                entity.SendMessage("_Update");
             }
 
             //Instantiate all Entites queued from last update
@@ -74,7 +74,7 @@ namespace CybrEngine {
         /// Runs every physics tick. Runs FixedUpate all on Entity
         /// </summary>
         public void FixedUpdate() {
-            var ents = objPool;
+            var ents = entityPool;
             for(int i = 0; i < ents.Count; i++) {
                 var e1 = ents[i];
 
@@ -106,7 +106,7 @@ namespace CybrEngine {
         private void AddInstantiatedObjects() {
             while(objQueue.Count > 0) {
                 var obj = objQueue.Dequeue();
-                objPool.Add(obj);
+                entityPool.Add(obj);
                 obj.SendMessage("_Start");
                 obj.SetActive(true);
             }
@@ -119,35 +119,34 @@ namespace CybrEngine {
         /// <param name="position"></param>
         /// <returns></returns>
         public T Instantiate<T>(Vector2 position) where T : Entity {
-            var type = typeof(T);
-            Entity newObject = null;
-            if (typeof(Entity).IsAssignableFrom(typeof(T))){
-                newObject = Entity.Construct<T>();
-                newObject.Transform.Position = position;
+            var entity = Entity.Construct<T>();
+            entity.Transform.Position = position;
 
-                newObject.SendMessage("_Awake");
-                objQueue.Enqueue(newObject);
-                return (T)newObject;
-            }
-            throw new Exception("No Object of type " + typeof(T));
+            entity.SendMessage("_Awake");
+            objQueue.Enqueue(entity);
+            return (T)entity;
         }
 
         public T GetObjectOfType<T>() where T : Entity{
-            return (T)objPool.Find(e => e is T);
+            return (T)entityPool.Find(e => e is T);
         }
 
         public List<Entity> GetObjectsOfType<T>() where T : Entity{
-            return objPool.FindAll(e => e is T);
+            return entityPool.FindAll(e => e is T);
         }
 
         public List<Entity> GetAll(){
-            return objPool;
+            return entityPool;
         }
 
-        public Entity AddInstance(Entity gameObject){
-            gameObject.SendMessage("_Awake");
-            objQueue.Enqueue(gameObject);
-            return gameObject;
+        public Entity AddInstance(Entity entity){
+            if (!entity){
+                throw new ArgumentNullException("Entity reference null");
+            }
+
+            entity.SendMessage("_Awake");
+            objQueue.Enqueue(entity);
+            return entity;
         }
 
         /// <summary>
