@@ -72,16 +72,6 @@ namespace CybrEngine {
             return HashCode.Combine(base.GetHashCode(), Name, ID);
         }
 
-        public Particle EmitParticle(Particle particle, Transform transform) {
-            var p = particle.Instance();
-            p.Bounds = Bounds;
-            return ParticleHandler.Emit(p, p.Transform.Position);
-        }
-
-        public Particle EmitParticle(Particle particle, Vector2 position) {
-            return ParticleHandler.Emit(particle.Instance(), position);
-        }
-
         public new Entity Instantiate<T>() where T : Entity {
             return Instantiate<T>(Position);
         }

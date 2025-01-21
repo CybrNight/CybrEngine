@@ -16,7 +16,7 @@ namespace CybrEngine {
 
             entity.ID = GLOBAL_ID++;
             entity.Transform = new Transform();
-            entity.ObjectAllocator = Autoload.ObjectAllocator;
+            entity.ObjectAllocator = Autoload.EntityAllocator;
             entity.ComponentAllocator = Autoload.ComponentAllocator;
             entity.ParticleHandler = Autoload.ParticleHandler;
 

@@ -89,18 +89,25 @@ namespace CybrEngine {
             Assets.Content = Content;
             Assets.GraphicsDevice = GraphicsDevice;
 
-            objAlloc = Autoload.ObjectAllocator;
+            Autoload.Construct();
+
+            objAlloc = Autoload.EntityAllocator;
             particleHandler = Autoload.ParticleHandler;
             inputHandler = Autoload.InputHandler;
 
             //Initialize singleton handlers
         }
 
+        public void OnContentLoaded(){
+            GameInitialized = _game.GameInit();
+            GameRunning = _game.GameStart();
+        }
+
         public void StartGame() {
             ContentLoaded = _game.LoadContent();
-            if(ContentLoaded) {
-                GameInitialized = _game.GameInit();
-                GameRunning = _game.GameStart();
+
+            if (ContentLoaded){
+                OnContentLoaded();
             }
         }
 

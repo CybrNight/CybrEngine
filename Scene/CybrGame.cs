@@ -27,7 +27,7 @@ namespace CybrEngine {
         private bool ContentLoaded { get; set; } = false;
 
         public CybrGame() {
-            objAlloc = Autoload.ObjectAllocator;
+            objAlloc = Autoload.EntityAllocator;
         }
 
         public Entity Instantiate(Entity instance) {

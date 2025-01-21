@@ -14,7 +14,7 @@ namespace CybrEngine {
                 var obj = Builder.Construct<T>(paramTypes, paramVals);
 
                 obj.ID = GLOBAL_ID++;
-                obj.ObjectAllocator = Autoload.ObjectAllocator;
+                obj.ObjectAllocator = Autoload.EntityAllocator;
                 obj.ParticleHandler = Autoload.ParticleHandler;
                 obj.Name = obj.GetType().ToString();
 

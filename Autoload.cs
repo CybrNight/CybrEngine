@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace CybrEngine {
     internal static class Autoload{
 
-        public static EntityAllocator ObjectAllocator;
+        public static SignalBus SignalBus;
+        public static EntityAllocator EntityAllocator;
         public static ComponentAllocator ComponentAllocator;
         public static InputHandler InputHandler;
         public static ParticleStore ParticleHandler;
@@ -15,15 +16,16 @@ namespace CybrEngine {
         public static PhysicsHandler PhysicsHandler;
 
         public static void Reset(){
-            ObjectAllocator.Reset();
+            EntityAllocator.Reset();
             InputHandler.Reset();
             ParticleHandler.Reset();
             SceneManager.Reset();
             PhysicsHandler.Reset();
         }
 
-        static Autoload(){
-            ObjectAllocator = EntityAllocator.Instance;
+        public static void Construct(){
+            SignalBus = SignalBus.Instance; 
+            EntityAllocator = EntityAllocator.Instance;
             ComponentAllocator = ComponentAllocator.Instance;
             InputHandler = InputHandler.Instance;
             ParticleHandler = ParticleStore.Instance; 
