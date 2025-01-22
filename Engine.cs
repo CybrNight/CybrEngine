@@ -33,7 +33,7 @@ namespace CybrEngine {
         }
 
         public void StartGame() {
-            ContentLoaded = _game.LoadGameContent();
+            //ContentLoaded = _game.LoadGameContent();
 
             if (ContentLoaded){
                 SignalBus.Emit("content-loaded");

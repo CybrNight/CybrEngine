@@ -16,7 +16,7 @@ namespace CybrEngine {
         /// Defines singleton reference to SignalBus
         /// </summary>
         private static Dictionary<string, List<EventHandler>> channels;
-        public delegate void EventHandler(string channel, object[] args);
+        public delegate void EventHandler(object[] args);
 
         private static SignalBus _instance;
         public static SignalBus Instance {
@@ -66,7 +66,7 @@ namespace CybrEngine {
 
         public static int Emit(string channel, params object[] args) {
             if(!channels.TryGetValue(channel, out var handlers)) return 0;
-            handlers.ForEach(handler => handler(channel, args));
+            handlers.ForEach(handler => handler(args));
             return handlers.Count;
         }
     }

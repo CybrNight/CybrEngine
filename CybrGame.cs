@@ -75,14 +75,7 @@ DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
 
             IsMouseVisible = true;
 
-            ContentLoaded = LoadGameContent();
-
-            if(ContentLoaded) {
-                GameInitialized = GameInit();
-                if(GameInitialized) {
-                    GameRunning = GameStart();
-                }
-            }
+            SignalBus.Emit("content-loaded");
         }
 
         protected override void BeginRun() {
@@ -166,9 +159,33 @@ DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
             entityAllocator.FixedUpdate();
         }
 
+        private void OnContentLoaded(object[] args) {
+            ContentLoaded = LoadGameContent();
+            if(ContentLoaded) {
+                SignalBus.Emit("game-content-loaded");
+            }
+        }
+
+        private void OnGameContentLoaded(object[] args){
+            GameInitialized = GameInit();
+            if (GameInitialized){
+                SignalBus.Emit("game-initialized");
+            }
+        }
+
+        private void OnGameInitialized(object[] args){
+            GameStart();    
+        }
+
 
         protected sealed override void Initialize(){
             entityAllocator = Autoload.EntityAllocator;
+
+            // Connect game start signals
+            SignalBus.Connect("content-loaded", OnContentLoaded);
+            SignalBus.Connect("game-content-loaded", OnGameContentLoaded);
+            SignalBus.Connect("game-initialized", OnGameInitialized);
+
             base.Initialize();
         }
 
