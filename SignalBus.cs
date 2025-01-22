@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace CybrEngine {
     
     public static class SignalExtensions{
-        public static int Emit(this Object sender, string channel, object[] args) {
-            return SignalBus.Emit(sender, channel, args);
+        public static int Emit(string channel, object[] args) {
+            return SignalBus.Emit(channel, args);
         }
 
     }
@@ -16,7 +16,7 @@ namespace CybrEngine {
         /// Defines singleton reference to SignalBus
         /// </summary>
         private static Dictionary<string, List<EventHandler>> channels;
-        public delegate void EventHandler(Object sender, string channel, object[] args);
+        public delegate void EventHandler(string channel, object[] args);
 
         private static SignalBus _instance;
         public static SignalBus Instance {
@@ -51,18 +51,22 @@ namespace CybrEngine {
             }
         }
 
-        public static Signal Connect(string channel, EventHandler handler) {
+        public static void Connect(string channel, EventHandler handler) {
             List<EventHandler> listeners;
             if(channels.ContainsKey(channel))
                 listeners = channels[channel];
             else
                 channels[channel] = listeners = new();
             listeners.Add(handler);
-            return new Signal(channel, handler);
         }
-        public static int Emit(Object sender, string channel, params object[] args) {
+
+        public static int Emit(string channel){
+            return Emit(channel, new object[] { });
+        }
+
+        public static int Emit(string channel, params object[] args) {
             if(!channels.TryGetValue(channel, out var handlers)) return 0;
-            handlers.ForEach(handler => handler(sender, channel, args));
+            handlers.ForEach(handler => handler(channel, args));
             return handlers.Count;
         }
     }
