@@ -80,8 +80,8 @@ namespace CybrEngine {
             return ObjectAllocator.Instantiate<T>(position);
         }
 
-        public T FindEntityOfType<T>() where T : Entity {
-            return ObjectAllocator.GetObjectOfType<T>();
+        public Entity FindEntityOfType<T>() where T : Entity {
+            return SceneManager.CurrentScene.Root.Find<T>();
         }
 
         public static implicit operator bool(Entity e) {
