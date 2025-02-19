@@ -26,7 +26,7 @@ namespace CybrEngine {
 
     public class Config {
 
-        public static WindowRect WINDOW { get; set; } = new WindowRect(640, 480);
+        public static WindowRect WINDOW { get; set; } = new WindowRect(1280, 720);
 
         public static int WINDOW_WIDTH { get { return WINDOW.Width; } }
         public static int WINDOW_HEIGHT { get { return WINDOW.Height; } }
