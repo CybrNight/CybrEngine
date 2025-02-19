@@ -42,8 +42,8 @@ namespace CybrEngine {
             IsFixedTimeStep = false;
 
             //Setup Window
-            Graphics.PreferredBackBufferWidth = 640;
-            Graphics.PreferredBackBufferHeight = 480;
+            Graphics.PreferredBackBufferWidth = Config.WINDOW_WIDTH;
+            Graphics.PreferredBackBufferHeight = Config.WINDOW_HEIGHT;
             Window.IsBorderless = false;
             Graphics.IsFullScreen = false;
             Graphics.HardwareModeSwitch = true;
@@ -58,8 +58,7 @@ namespace CybrEngine {
 
             fixedUpdateRate = (int)(Config.FIXED_UPDATE_FPS == 0 ? 0 : (1000 / (float)Config.FIXED_UPDATE_FPS));
             Time.fixedUpdateRate = TimeSpan.FromTicks((long)TimeSpan.TicksPerSecond / Config.FIXED_UPDATE_FPS);
-            Time.fixedUpdateMult = (float)
-DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
+            Time.fixedUpdateMult = (float) DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
 
         }
 
@@ -140,8 +139,8 @@ DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
                 _accumulatedTime += elapsedTime;
 
                 if(elapsedTime > 0) {
-                    ComponentAllocator.Instance.Update();
-                    Autoload.EntityAllocator.Update();
+                    Autoload.ComponentAllocator.Update();
+                    Autoload.SceneManager.Update();
                 }
 
                 // Fixed update loop
@@ -156,7 +155,7 @@ DEFAULT_FIXED_UPDATE_RATE / Config.FIXED_UPDATE_FPS;
 
 
         private void FixedUpdate() {
-            entityAllocator.FixedUpdate();
+            Autoload.SceneManager.FixedUpdate();
         }
 
         private void OnContentLoaded(object[] args) {
